@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-loading-bar.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"aluggnb.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="-– title: java-Day4——类方法 date: 2023-10-02 20:44:01 tags: categories: - Java -– 类属性、类方法有时希望无论是否产生了对象或无论产生了多少对象的情况下，某些特定的数据在内存空间里只有一份。 static修饰的结构:属性、方法、代码块、内部类 静态变量对比静态变量与实例变量： ​	1.个数： ​	静态变量：内存空间只有一份，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Alugg&#39;s Blog">
+<meta property="og:url" content="https://aluggnb.com/2023/10/03/javaday4_oob3/index.html">
+<meta property="og:site_name" content="Alugg&#39;s Blog">
+<meta property="og:description" content="-– title: java-Day4——类方法 date: 2023-10-02 20:44:01 tags: categories: - Java -– 类属性、类方法有时希望无论是否产生了对象或无论产生了多少对象的情况下，某些特定的数据在内存空间里只有一份。 static修饰的结构:属性、方法、代码块、内部类 静态变量对比静态变量与实例变量： ​	1.个数： ​	静态变量：内存空间只有一份，">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-10-02T22:44:53.891Z">
+<meta property="article:modified_time" content="2023-10-03T16:01:30.515Z">
+<meta property="article:author" content="Alugg">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://aluggnb.com/2023/10/03/javaday4_oob3/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title> | Alugg's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Alugg's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://aluggnb.com/2023/10/03/javaday4_oob3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="Alugg">
+      <meta itemprop="description" content="Step out of your comfort zone">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Alugg's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-10-03 06:44:53" itemprop="dateCreated datePublished" datetime="2023-10-03T06:44:53+08:00">2023-10-03</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-10-04 00:01:30" itemprop="dateModified" datetime="2023-10-04T00:01:30+08:00">2023-10-04</time>
+              </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>2.3k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>-–<br> title: java-Day4——类方法<br> date: 2023-10-02 20:44:01<br> tags:<br> categories:<br> - Java<br> -–</p>
+<h1 id="类属性、类方法"><a href="#类属性、类方法" class="headerlink" title="类属性、类方法"></a>类属性、类方法</h1><p>有时希望无论是否产生了对象或无论产生了多少对象的情况下，某些特定的数据在内存空间里只有一份。</p>
+<p>static修饰的结构:属性、方法、代码块、内部类</p>
+<h2 id="静态变量"><a href="#静态变量" class="headerlink" title="静态变量"></a>静态变量</h2><p>对比静态变量与实例变量：</p>
+<p>​	1.个数：</p>
+<p>​	静态变量：内存空间只有一份，被类的多个对象共享。</p>
+<p>​	实例变量：类的每一个实例都保存着一份实例变量</p>
+<p>​	2.内存位置：</p>
+<p>​	静态变量：jdk6之前存放在方法去。 jdk7及之后，存放在堆空间</p>
+<p>​	实例变量：存放在堆空间的对象实体中</p>
+<p>​	3.加载时机</p>
+<p>​	静态变量：随着类的加载而加载，由于类只会加载一次，所以静态变量也只有一份</p>
+<p>​	实例变量：随着对象的创建而创建。每个对象拥有一份实例变量</p>
+<p>​	4.调用者</p>
+<p>​	静态变量：可以被类和实例调用</p>
+<p>​	实例变量：只能通过实例来调用</p>
+<p>​	5.消亡时机</p>
+<p>​	静态变量：随着类的卸载而消亡</p>
+<p>​	实例变量：随着对象的消亡而消亡</p>
+<h2 id="静态方法"><a href="#静态方法" class="headerlink" title="静态方法"></a>静态方法</h2><ul>
+<li><p>随着类的加载而加载</p>
+</li>
+<li><p>可以通过“类.静态加载”，直接调用静态方法</p>
+</li>
+<li><p>静态方法可以调用静态的属性和方法，但不可以调用任何非静态的结构</p>
+<p>但非静态方法可以调用当前类中的静态结构</p>
+</li>
+</ul>
+<p>什么时候需要将属性声明为静态的</p>
+<ul>
+<li>判断当前类的多个实例是否能共享此成员变量，且此成员变量的值是相同的</li>
+<li>常将一些常量声明为静态，如Math类中的PI</li>
+</ul>
+<p>什么时候需要将方法声明为静态？</p>
+<ul>
+<li>方法内操作的变量如果都是静态变量（而非实例变量），则建议声明为静态方法</li>
+<li>常常将工具栏的方法声明为静态方法。比如Array类、Math类</li>
+</ul>
+<h1 id="单例设计模式-Singleton"><a href="#单例设计模式-Singleton" class="headerlink" title="单例设计模式(Singleton)"></a>单例设计模式(Singleton)</h1><p>定义:某个类只能存在一个对象实例</p>
+<h2 id="实现思路"><a href="#实现思路" class="headerlink" title="实现思路"></a>实现思路</h2><p>如果要让虚拟机只能产生一个对象。首先必须将<strong>类的构造器的访问权限设置为private</strong>,这样就不能用new操作符在类的外部产生类的对象了，但在类的内部可以产生该类的对象，因为在类的外部开始无法得到类的对象，<strong>只能通过调用类的某个静态方法</strong>以返回类内部创建的对象，静态方法只能访问类中的静态成员变量，所以只能类内部产生的<strong>该类对象的变量也必须定义成静态的</strong></p>
+<h2 id="具体实现方式"><a href="#具体实现方式" class="headerlink" title="具体实现方式"></a>具体实现方式</h2><p>饿汉式</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Bank</span>&#123;</span><br><span class="line">    <span class="comment">//1.类的构造私有化</span></span><br><span class="line">    <span class="keyword">private</span> <span class="title function_">Bank</span><span class="params">()</span>&#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//2.在类的内部创建当前实例</span></span><br><span class="line">    <span class="comment">//4.此属性也必须声明为static</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="type">Bank</span> <span class="variable">instance</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Bank</span>();</span><br><span class="line"></span><br><span class="line">    <span class="comment">//3.使用getXXx()获取当前实例，必须声明为static</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> Bank <span class="title function_">getInstance</span><span class="params">()</span>&#123;</span><br><span class="line">        <span class="keyword">return</span> instance;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>&#x2F;&#x2F;懒汉式</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">GirlFriend</span>&#123;</span><br><span class="line">    <span class="comment">//1.类的构造器私有化</span></span><br><span class="line">    <span class="keyword">private</span> <span class="title function_">GirlFriend</span><span class="params">()</span>&#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//2.声明当前类的实例</span></span><br><span class="line">    <span class="comment">//4.此属性也必须声明static</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="type">GirlFriend</span> <span class="variable">instance</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//3.通过getXX()获取当前类的实例，如果未创建，则在方法内部创建</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> GirlFriend <span class="title function_">getInstance</span><span class="params">()</span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(instance ==<span class="literal">null</span>)&#123;</span><br><span class="line">            instance = <span class="keyword">new</span> <span class="title class_">GirlFriend</span>();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> instance;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>特点对比</strong>：</p>
+<ul>
+<li><p>饿汉式：立即加载，随着类的加载，当前唯一实例就创建了</p>
+</li>
+<li><p>懒汉式：延迟加载，在需要使用时，进行创建了</p>
+</li>
+</ul>
+<p><strong>优缺点</strong>：</p>
+<ul>
+<li>饿汉式：写法简单，由于内存中较早加载，使用更方便、更快。是线程安全的。（缺点）内存中占用实际较长</li>
+<li>懒汉式：在需要时进行创建，节省内存空间。（缺点）线程不安全</li>
+</ul>
+<h1 id="Main方法"><a href="#Main方法" class="headerlink" title="Main方法"></a>Main方法</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">public static void main(String[] args) &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>理解1：看作一个普通的静态方法</p>
+<p>理解2：看作是程序的入口，格式的固定的</p>
+<p>2.与控制台交互</p>
+<p>方式1：使用Scanner</p>
+<p>方式2：使用main()的形参进行传递</p>
+<h1 id="代码块"><a href="#代码块" class="headerlink" title="代码块"></a>代码块</h1><p><strong>作用</strong>：用于初始化类或对象的信息</p>
+<p><strong>代码块的修饰</strong>：只能使用static进行修饰</p>
+<p>具体使用：</p>
+<p>1.静态代码块：</p>
+<ul>
+<li><p>随着类的加载而执行</p>
+</li>
+<li><p>由于类的加载只有一次，进而静态代码块的执行，也只会执行一次</p>
+</li>
+<li><p>作用：用来初始化类的信息</p>
+</li>
+<li><p>内部可以声明变量、调用属性或方法、编写输出语句</p>
+</li>
+<li><p>静态先执行，非静态后执行</p>
+</li>
+<li><p>静态代码块内部只能调用静态结构</p>
+</li>
+</ul>
+<p>2.非静态代码块</p>
+<ul>
+<li>随着对象的创建而执行</li>
+<li>每创建当前类的一个实例，就会执行一次非静态代码块</li>
+<li>作用：用来初始化对象的信息</li>
+<li>内部可以声明变量、调用属性或方法、编写输出语句</li>
+<li>可以调用静态结构和非静态结构</li>
+</ul>
+<p>当赋值的值，一行代码没有办法获得该值时，我们可以考虑使用代码块</p>
+<h1 id="final关键字"><a href="#final关键字" class="headerlink" title="final关键字"></a>final关键字</h1><h2 id="final可以用于修饰类、方法、变量"><a href="#final可以用于修饰类、方法、变量" class="headerlink" title="final可以用于修饰类、方法、变量"></a>final可以用于修饰类、方法、变量</h2><p>类：表示此类不能被继承</p>
+<p>​	比如：String,SringBuffer, StringBuilder{}</p>
+<p>方法：表示此方法不能被重写</p>
+<p>​	比如 Object类中getClasse()</p>
+<p>变量：既可以修饰成员，也可以修饰局部变量。 此时变量其实变成了常量</p>
+<p>​	1.final修饰成员变量：哪些位置可以给成员变量赋值？</p>
+<ul>
+<li>显式赋值</li>
+<li>代码块中</li>
+<li>构造器中</li>
+</ul>
+<p>​	2.final修饰局部变量，一旦赋值不能改变</p>
+<ul>
+<li>方法内声明的局部变量：调用局部变量前，一定需要赋值，一旦赋值，不可更改</li>
+<li>方法的形参：在调用此方法时，给形参进行赋值</li>
+</ul>
+<p>final与static搭配修饰成员变量时：此成员变量称为<strong>全局常量</strong></p>
+<p>比如Math中的PI</p>
+
+    </div>
+
+    
+    
+    
+    
+      <div>
+      <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:24px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+      </div>
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Alugg
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://aluggnb.com/2023/10/03/javaday4_oob3/" title="">https://aluggnb.com/2023/10/03/javaday4_oob3/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+    
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/10/01/javaday2_oob2/" rel="prev" title="java-Day3——封装">
+      <i class="fa fa-chevron-left"></i> java-Day3——封装
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/10/03/javaday5_interface/" rel="next" title="">
+       <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%B1%BB%E5%B1%9E%E6%80%A7%E3%80%81%E7%B1%BB%E6%96%B9%E6%B3%95"><span class="nav-number">1.</span> <span class="nav-text">类属性、类方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9D%99%E6%80%81%E5%8F%98%E9%87%8F"><span class="nav-number">1.1.</span> <span class="nav-text">静态变量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9D%99%E6%80%81%E6%96%B9%E6%B3%95"><span class="nav-number">1.2.</span> <span class="nav-text">静态方法</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8D%95%E4%BE%8B%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-Singleton"><span class="nav-number">2.</span> <span class="nav-text">单例设计模式(Singleton)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E6%80%9D%E8%B7%AF"><span class="nav-number">2.1.</span> <span class="nav-text">实现思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B7%E4%BD%93%E5%AE%9E%E7%8E%B0%E6%96%B9%E5%BC%8F"><span class="nav-number">2.2.</span> <span class="nav-text">具体实现方式</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Main%E6%96%B9%E6%B3%95"><span class="nav-number">3.</span> <span class="nav-text">Main方法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E5%9D%97"><span class="nav-number">4.</span> <span class="nav-text">代码块</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#final%E5%85%B3%E9%94%AE%E5%AD%97"><span class="nav-number">5.</span> <span class="nav-text">final关键字</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#final%E5%8F%AF%E4%BB%A5%E7%94%A8%E4%BA%8E%E4%BF%AE%E9%A5%B0%E7%B1%BB%E3%80%81%E6%96%B9%E6%B3%95%E3%80%81%E5%8F%98%E9%87%8F"><span class="nav-number">5.1.</span> <span class="nav-text">final可以用于修饰类、方法、变量</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Alugg"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">Alugg</p>
+  <div class="site-description" itemprop="description">Step out of your comfort zone</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">7</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:lutianfr@gmail.com" title="E-Mail → mailto:lutianfr@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2023-09 – 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Alugg</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">15k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">14 分钟</span>
+</div>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
