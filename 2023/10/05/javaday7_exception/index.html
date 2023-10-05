@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-loading-bar.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"aluggnb.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="异常定义指的是程序在执行过程中，出现的非正常情况，如果补处理最终会导致JVM的非正常停止。 异常的抛出机制java中把不同的异常用不同的类表示，一旦发现某种异常，就创建该异常类型的对象，并throw。然后程序员可以catch到这个异常并处理；如果没有catch这个异常对象，那么这个异常对象将会导致程序的终止 如何对待异常 一遇到错误就终止程序的运行  编写程序时，充分的预防和避免。实在无法避免的，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="java-Day7——异常">
+<meta property="og:url" content="https://aluggnb.com/2023/10/05/javaday7_exception/index.html">
+<meta property="og:site_name" content="Alugg&#39;s Blog">
+<meta property="og:description" content="异常定义指的是程序在执行过程中，出现的非正常情况，如果补处理最终会导致JVM的非正常停止。 异常的抛出机制java中把不同的异常用不同的类表示，一旦发现某种异常，就创建该异常类型的对象，并throw。然后程序员可以catch到这个异常并处理；如果没有catch这个异常对象，那么这个异常对象将会导致程序的终止 如何对待异常 一遇到错误就终止程序的运行  编写程序时，充分的预防和避免。实在无法避免的，">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-10-05T15:11:05.000Z">
+<meta property="article:modified_time" content="2023-10-05T15:11:05.000Z">
+<meta property="article:author" content="Alugg">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://aluggnb.com/2023/10/05/javaday7_exception/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>java-Day7——异常 | Alugg's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Alugg's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://aluggnb.com/2023/10/05/javaday7_exception/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="Alugg">
+      <meta itemprop="description" content="Step out of your comfort zone">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Alugg's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          java-Day7——异常
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-10-05 23:11:05" itemprop="dateCreated datePublished" datetime="2023-10-05T23:11:05+08:00">2023-10-05</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>4.2k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>4 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="异常定义"><a href="#异常定义" class="headerlink" title="异常定义"></a>异常定义</h1><p>指的是程序在执行过程中，出现的非正常情况，如果补处理最终会导致JVM的非正常停止。</p>
+<h1 id="异常的抛出机制"><a href="#异常的抛出机制" class="headerlink" title="异常的抛出机制"></a>异常的抛出机制</h1><p>java中把不同的异常用不同的类表示，一旦发现某种异常，就创建该异常类型的对象，并throw。然后程序员可以catch到这个异常并处理；如果没有catch这个异常对象，那么这个异常对象将会导致程序的终止</p>
+<h1 id="如何对待异常"><a href="#如何对待异常" class="headerlink" title="如何对待异常"></a>如何对待异常</h1><ul>
+<li><p>一遇到错误就终止程序的运行</p>
+</li>
+<li><p>编写程序时，充分的预防和避免。实在无法避免的，编写相应的代码进行异常的检测、以及‘异常的处理‘，保证代码的健壮性</p>
+</li>
+</ul>
+<h1 id="异常的体系结构"><a href="#异常的体系结构" class="headerlink" title="异常的体系结构"></a>异常的体系结构</h1><h2 id="Throwable类"><a href="#Throwable类" class="headerlink" title="Throwable类"></a>Throwable类</h2><p>是java执行过程总发生异常事件对应的类的根父类</p>
+<h2 id="Error和Exception"><a href="#Error和Exception" class="headerlink" title="Error和Exception"></a>Error和Exception</h2><ul>
+<li><p>Error：java虚拟机无法解决的严重问题。如JVM系统内部错误、资源耗尽等严重情况。一般不编写针对性代码处理</p>
+<ul>
+<li>StackOverflowError, OutOfMemoryError</li>
+</ul>
+</li>
+<li><p>Exception：其他因编程错误或偶然的外在因素导致的一般性问题，需要使用针对性的代码进行处理，使程序继续运行。否则一旦发生异常，程序也会挂掉。如空指针访问、试图读取不在的文件、网络连接中断。</p>
+<ul>
+<li>编译时异常：执行javac.exe命令时出现异常<ul>
+<li>ClassNotFoundException</li>
+<li>FileNotFoundException</li>
+<li>IoException</li>
+</ul>
+</li>
+<li>运行时异常：执行java.exe命令时出现异常<ul>
+<li>ArrayIndexOutOfBoundsException</li>
+<li>NullPointerException</li>
+<li>ClassCastException</li>
+<li>NumberFomatException</li>
+<li>InpuitMismatchException</li>
+<li>ArithmeticException</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h1 id="编译时异常和运行时异常"><a href="#编译时异常和运行时异常" class="headerlink" title="编译时异常和运行时异常"></a>编译时异常和运行时异常</h1><ul>
+<li><p>编译时异常（checked异常)：在代码编译阶段，编译器就能明确警示当前代码可能发生xx异常，并且明确督促程序员提前编写处理它的代码。 如果程序员没有编写对应的处理代码，则编译器就会直接判定编译失败，从而不能生产字节码文件。这类异常的发生不是由程序员的代码引起的或者不是靠加简单判断可以避免的。如FileNotFoundException</p>
+</li>
+<li><p>运行时异常（runtime异常）：在代码编译阶段，编译器完全不做任何检查，无论该异常都不给任何提示。只有等代码运行起来并确实发生了xx异常，它才能被发现。通常，这类异常是由程序员的代码编写不当引起的。RuntimeException</p>
+</li>
+</ul>
+<h1 id="Java异常处理的方式"><a href="#Java异常处理的方式" class="headerlink" title="Java异常处理的方式"></a>Java异常处理的方式</h1><h2 id="方式一-try-catch-finally："><a href="#方式一-try-catch-finally：" class="headerlink" title="方式一 try-catch-finally："></a>方式一 <strong>try-catch-finally</strong>：</h2><ol>
+<li>“抛”：程序执行过程中，一旦出现异常，就会在异常的代码处，生产对应异常类的对象，并将对象抛出，一旦抛出，此程序就不执行其后的代码了。</li>
+<li>“抓”：针对于1中抛出的异常，进行捕获处理。一旦将异常进行了处理，代码就可以正常处理</li>
+</ol>
+<p><strong>基本结构</strong>：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span>&#123;</span><br><span class="line">    ...<span class="comment">//可能产生异常的代码</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">catch</span>(异常类型<span class="number">1</span>)&#123;</span><br><span class="line">    ...<span class="comment">//产生异常1类型时的处理方式</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">catch</span>(异常类型<span class="number">2</span>)&#123;</span><br><span class="line">    ...<span class="comment">//产生异常2类型时的处理方式</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">finally</span>&#123;</span><br><span class="line">    ...<span class="comment">//无论是否发生异常，都无条件执行的语句</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>使用细节：</strong></p>
+<ul>
+<li><p>如果声明了多个catch结构，不同的异常类型若不存在父子关系的情况下，声明位置无所谓。如果多个异常类型满足父子关系的，则必须将子类声明在父类结构的上面。</p>
+</li>
+<li><p>try中声明的变量，出了try结果后，就不可以进行调用了</p>
+</li>
+<li><p>try catch结构是可以嵌套的</p>
+</li>
+</ul>
+<p><strong>Catch中处理异常的方式</strong>：</p>
+<ol>
+<li><p>自己编写输出的语句</p>
+</li>
+<li><p>printStackTrace()：打印异常详细信息。（推荐)</p>
+</li>
+<li><p>getMessage（）:获取发生异常的原因</p>
+</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">test1</span><span class="params">()</span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">str</span> <span class="operator">=</span> <span class="string">&quot;123&quot;</span>;</span><br><span class="line">        str = <span class="string">&quot;abc&quot;</span>;</span><br><span class="line">        <span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> Integer.parseInt(str);</span><br><span class="line">        System.out.println(i);</span><br><span class="line">    &#125;<span class="keyword">catch</span> (NumberFormatException e)&#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">        System.out.println(e.getMessage());</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">    System.out.println(<span class="string">&quot;程序结束&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>开发体会：</strong></p>
+<ul>
+<li><p>运行时异常：</p>
+<p>​	开发中，通常就不进行显示的处理。一旦在程序执行中，出现了异常，就根据异常的提升信息修改代码。</p>
+</li>
+<li><p>编译时异常:</p>
+<p>​	一定要处理，否则编译不过。</p>
+</li>
+</ul>
+<p><strong>finally的理解</strong></p>
+<ul>
+<li><p>将一定要执行的代码声明在finally结构中</p>
+</li>
+<li><p>无论try或catch中是否存在仍未被处理的异常，无论try中或catch中是否存在return语句等，finally中声明的语句一定会执行</p>
+</li>
+<li><p>finally语句和catch语句是可选的，但finally不能单独使用</p>
+</li>
+</ul>
+<p><strong>什么代码一定要放入finally</strong></p>
+<p>输入流、输出流、数据库连接、Socket连接等资源，在使用完以后，必须是显式的进行关闭操作，否则GC不会自动的回收这些资源，进而导致内存的泄露</p>
+<h2 id="方式二-throws"><a href="#方式二-throws" class="headerlink" title="方式二:throws"></a>方式二:<strong>throws</strong></h2><p><strong>格式：</strong> 在方法的声明处，使用throws 异常1，异常2,…</p>
+<p><strong>是否真正处理了异常：</strong></p>
+<ul>
+<li>从编译是否能通过的角度看，看成给出了异常万一要是出现时候的解决方法。此方案就是，继续向上抛出</li>
+<li>但是此throws方式，仅是将可能出现的异常抛给方法的调用者。此调用者仍然需要考虑如何处理相关异常，从这个角度看，throws的方式不算真正意义上处理了异常。</li>
+</ul>
+<p><strong>方法重写时的要求</strong>（针对于编译时异常）：</p>
+<p>子类重写方法抛出的异常类型要么与父类的方法抛出的异常<strong>相同</strong>或者是该异常类型的<strong>子类</strong></p>
+<h1 id="开发中如何选择异常处理方法"><a href="#开发中如何选择异常处理方法" class="headerlink" title="开发中如何选择异常处理方法"></a>开发中如何选择异常处理方法</h1><ul>
+<li>涉及资源的调用（流、数据库连接、网络连接），try-catch-finally，从而保证内存不泄露</li>
+<li>父类被重写的方法没有throws异常类型，子类重写方法出现异常只能使用try-catch-finally</li>
+<li>开发中方法a依次调用b,c,d等方法，方法b,c,d之间是递进关系。此时如果b,c,d中有异常，我们通常选择使用throws，而方法a中通常使用try-cat-finally</li>
+</ul>
+<h1 id="手动throw异常对象"><a href="#手动throw异常对象" class="headerlink" title="手动throw异常对象"></a>手动throw异常对象</h1><p>在实际开发中，如果出现不满足<strong>具体场景</strong>的代码问题，我们就有必要抛出一个指定类型的异常对象</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">StudentTest</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">Student</span> <span class="variable">s1</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Student</span>();</span><br><span class="line">        s1.regist(-<span class="number">10</span>);</span><br><span class="line">        System.out.println(s1);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Student</span>&#123;</span><br><span class="line">    <span class="type">int</span> id;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">regist</span><span class="params">(<span class="type">int</span> id)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (id &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="built_in">this</span>.id = id;</span><br><span class="line">        &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">RuntimeException</span>(<span class="string">&quot;输入ID非法&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">toString</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;Student&#123;&quot;</span> +</span><br><span class="line">                <span class="string">&quot;id=&quot;</span> + id +</span><br><span class="line">                <span class="string">&#x27;&#125;&#x27;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="自动抛和手动抛异常的理解"><a href="#自动抛和手动抛异常的理解" class="headerlink" title="自动抛和手动抛异常的理解"></a>自动抛和手动抛异常的理解</h1><ul>
+<li>自动抛：程序执行过程中，一旦出现异常，就会在异常的代码处，自动生产对应异常类的对象，并将对象抛出</li>
+<li>手动抛：程序执行过程中，不满足指定条件的情况下，我们主动使用throw+异常类的对象方式抛出异常对象。</li>
+</ul>
+<p>抓：</p>
+<ul>
+<li>狭义理解：try-catch的方式捕获异常，并处理</li>
+<li>广义理解：抓可以理解为“处理“。则此时对应着1.try-catch-finally 2.throws</li>
+</ul>
+<h1 id="自定义异常："><a href="#自定义异常：" class="headerlink" title="自定义异常："></a>自定义异常：</h1><h2 id="定义方式"><a href="#定义方式" class="headerlink" title="定义方式"></a>定义方式</h2><ol>
+<li><p>通常继承于RuntimeException、Exception</p>
+</li>
+<li><p>通常提供几个重载的构造器</p>
+</li>
+<li><p>提供一个全局常量，声明为static final long serialVersionUID</p>
+</li>
+</ol>
+<h2 id="使用方式"><a href="#使用方式" class="headerlink" title="使用方式"></a>使用方式</h2><ul>
+<li>在具体代码中，满足指定条件的情况下，需要收到的使用“throw+自定义异常类的对象”方法，将异常对象抛出。</li>
+<li>如果自定义异常类是非运行时异常，则必须考虑如何处理此异常类的对象（1.try-cat-finally 2.throws)</li>
+</ul>
+<h2 id="自定义异常的目的"><a href="#自定义异常的目的" class="headerlink" title="自定义异常的目的"></a>自定义异常的目的</h2><p>通过异常的名称就能直接判断此异常出现的原因。尽然如此，我们就有必要在实际开发场景中，不满足我们指定条件时，知名我们自己特有的异常类，通过异常类的名称，就能判断出具体出现的问题</p>
+<h1 id="常见问题："><a href="#常见问题：" class="headerlink" title="常见问题："></a>常见问题：</h1><h2 id="1-throw-和throws的区别"><a href="#1-throw-和throws的区别" class="headerlink" title="1.throw 和throws的区别"></a>1.throw 和throws的区别</h2><p>形：</p>
+<p>throw:使用在方法内部，throw异常类的对象</p>
+<p>throws：使用在方法的声明处，”throws 异常类1， 异常类2”</p>
+<p>作用：</p>
+<p>一个抛，一个是抓</p>
+<h2 id="2-java的异常体系结构，异常顶级接口是什么，exception下有哪些类"><a href="#2-java的异常体系结构，异常顶级接口是什么，exception下有哪些类" class="headerlink" title="2.java的异常体系结构，异常顶级接口是什么，exception下有哪些类"></a>2.java的异常体系结构，异常顶级接口是什么，exception下有哪些类</h2><h2 id="3-java异常处理机制"><a href="#3-java异常处理机制" class="headerlink" title="3.java异常处理机制"></a>3.java异常处理机制</h2><p>两种处理方案，try-catch-finally; throws</p>
+<h2 id="4-运行异常与一般异常区别"><a href="#4-运行异常与一般异常区别" class="headerlink" title="4.运行异常与一般异常区别"></a>4.运行异常与一般异常区别</h2><p>运行时异常：RuntimeException</p>
+<ul>
+<li>编译可以通过，运行时可能抛出。出现概率高一些；一般针对于运行时异常，都不处理</li>
+</ul>
+<p>一般异常：Exception</p>
+<ul>
+<li>编译不能通过，要求必须在编译之前，考虑异常的处理。不处理编译不通过。</li>
+</ul>
+<h2 id="5-常见的异常"><a href="#5-常见的异常" class="headerlink" title="5.常见的异常"></a>5.常见的异常</h2><h2 id="6-final、finally、finalize的区别"><a href="#6-final、finally、finalize的区别" class="headerlink" title="6.final、finally、finalize的区别"></a>6.final、finally、finalize的区别</h2><h2 id="7-不适用try-catch-程序出现异常会如何？"><a href="#7-不适用try-catch-程序出现异常会如何？" class="headerlink" title="7.不适用try-catch,程序出现异常会如何？"></a>7.不适用try-catch,程序出现异常会如何？</h2><p>对当前方法来讲，如果不适用try-catch，则在出现异常对象以后会抛出此对象。如果没有处理方案，就会终止程序的执行</p>
+<h2 id="8-try-catch捕获的是什么异常？"><a href="#8-try-catch捕获的是什么异常？" class="headerlink" title="8.try,catch捕获的是什么异常？"></a>8.try,catch捕获的是什么异常？</h2><p>Exception。非error</p>
+<h2 id="9-如果执行finally代码块之前返回了结果或者Jvm退出了，此时finally代码块还会执行吗？"><a href="#9-如果执行finally代码块之前返回了结果或者Jvm退出了，此时finally代码块还会执行吗？" class="headerlink" title="9.如果执行finally代码块之前返回了结果或者Jvm退出了，此时finally代码块还会执行吗？"></a>9.如果执行finally代码块之前返回了结果或者Jvm退出了，此时finally代码块还会执行吗？</h2><p>一定会执行。除了system.exit(0)</p>
+<h2 id="10-try语句中有return语句，最后写finally语句，finally语句中的code会不会执行？何时执行？如果执行是在return前还是后"><a href="#10-try语句中有return语句，最后写finally语句，finally语句中的code会不会执行？何时执行？如果执行是在return前还是后" class="headerlink" title="10.try语句中有return语句，最后写finally语句，finally语句中的code会不会执行？何时执行？如果执行是在return前还是后"></a>10.try语句中有return语句，最后写finally语句，finally语句中的code会不会执行？何时执行？如果执行是在return前还是后</h2><p>会。先执行finally代码在return出结果</p>
+
+    </div>
+
+    
+    
+    
+    
+      <div>
+      <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:24px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+      </div>
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Alugg
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://aluggnb.com/2023/10/05/javaday7_exception/" title="java-Day7——异常">https://aluggnb.com/2023/10/05/javaday7_exception/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+    
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/10/04/javaday6_enum/" rel="prev" title="java-Day6——枚举类">
+      <i class="fa fa-chevron-left"></i> java-Day6——枚举类
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BC%82%E5%B8%B8%E5%AE%9A%E4%B9%89"><span class="nav-number">1.</span> <span class="nav-text">异常定义</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BC%82%E5%B8%B8%E7%9A%84%E6%8A%9B%E5%87%BA%E6%9C%BA%E5%88%B6"><span class="nav-number">2.</span> <span class="nav-text">异常的抛出机制</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E5%AF%B9%E5%BE%85%E5%BC%82%E5%B8%B8"><span class="nav-number">3.</span> <span class="nav-text">如何对待异常</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BC%82%E5%B8%B8%E7%9A%84%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84"><span class="nav-number">4.</span> <span class="nav-text">异常的体系结构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Throwable%E7%B1%BB"><span class="nav-number">4.1.</span> <span class="nav-text">Throwable类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Error%E5%92%8CException"><span class="nav-number">4.2.</span> <span class="nav-text">Error和Exception</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BC%96%E8%AF%91%E6%97%B6%E5%BC%82%E5%B8%B8%E5%92%8C%E8%BF%90%E8%A1%8C%E6%97%B6%E5%BC%82%E5%B8%B8"><span class="nav-number">5.</span> <span class="nav-text">编译时异常和运行时异常</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Java%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E7%9A%84%E6%96%B9%E5%BC%8F"><span class="nav-number">6.</span> <span class="nav-text">Java异常处理的方式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B9%E5%BC%8F%E4%B8%80-try-catch-finally%EF%BC%9A"><span class="nav-number">6.1.</span> <span class="nav-text">方式一 try-catch-finally：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B9%E5%BC%8F%E4%BA%8C-throws"><span class="nav-number">6.2.</span> <span class="nav-text">方式二:throws</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BC%80%E5%8F%91%E4%B8%AD%E5%A6%82%E4%BD%95%E9%80%89%E6%8B%A9%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E6%96%B9%E6%B3%95"><span class="nav-number">7.</span> <span class="nav-text">开发中如何选择异常处理方法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%89%8B%E5%8A%A8throw%E5%BC%82%E5%B8%B8%E5%AF%B9%E8%B1%A1"><span class="nav-number">8.</span> <span class="nav-text">手动throw异常对象</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%87%AA%E5%8A%A8%E6%8A%9B%E5%92%8C%E6%89%8B%E5%8A%A8%E6%8A%9B%E5%BC%82%E5%B8%B8%E7%9A%84%E7%90%86%E8%A7%A3"><span class="nav-number">9.</span> <span class="nav-text">自动抛和手动抛异常的理解</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%87%AA%E5%AE%9A%E4%B9%89%E5%BC%82%E5%B8%B8%EF%BC%9A"><span class="nav-number">10.</span> <span class="nav-text">自定义异常：</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9A%E4%B9%89%E6%96%B9%E5%BC%8F"><span class="nav-number">10.1.</span> <span class="nav-text">定义方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%96%B9%E5%BC%8F"><span class="nav-number">10.2.</span> <span class="nav-text">使用方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%87%AA%E5%AE%9A%E4%B9%89%E5%BC%82%E5%B8%B8%E7%9A%84%E7%9B%AE%E7%9A%84"><span class="nav-number">10.3.</span> <span class="nav-text">自定义异常的目的</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98%EF%BC%9A"><span class="nav-number">11.</span> <span class="nav-text">常见问题：</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-throw-%E5%92%8Cthrows%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">11.1.</span> <span class="nav-text">1.throw 和throws的区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-java%E7%9A%84%E5%BC%82%E5%B8%B8%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84%EF%BC%8C%E5%BC%82%E5%B8%B8%E9%A1%B6%E7%BA%A7%E6%8E%A5%E5%8F%A3%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%8Cexception%E4%B8%8B%E6%9C%89%E5%93%AA%E4%BA%9B%E7%B1%BB"><span class="nav-number">11.2.</span> <span class="nav-text">2.java的异常体系结构，异常顶级接口是什么，exception下有哪些类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-java%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E6%9C%BA%E5%88%B6"><span class="nav-number">11.3.</span> <span class="nav-text">3.java异常处理机制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E8%BF%90%E8%A1%8C%E5%BC%82%E5%B8%B8%E4%B8%8E%E4%B8%80%E8%88%AC%E5%BC%82%E5%B8%B8%E5%8C%BA%E5%88%AB"><span class="nav-number">11.4.</span> <span class="nav-text">4.运行异常与一般异常区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E5%B8%B8%E8%A7%81%E7%9A%84%E5%BC%82%E5%B8%B8"><span class="nav-number">11.5.</span> <span class="nav-text">5.常见的异常</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-final%E3%80%81finally%E3%80%81finalize%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">11.6.</span> <span class="nav-text">6.final、finally、finalize的区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-%E4%B8%8D%E9%80%82%E7%94%A8try-catch-%E7%A8%8B%E5%BA%8F%E5%87%BA%E7%8E%B0%E5%BC%82%E5%B8%B8%E4%BC%9A%E5%A6%82%E4%BD%95%EF%BC%9F"><span class="nav-number">11.7.</span> <span class="nav-text">7.不适用try-catch,程序出现异常会如何？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-try-catch%E6%8D%95%E8%8E%B7%E7%9A%84%E6%98%AF%E4%BB%80%E4%B9%88%E5%BC%82%E5%B8%B8%EF%BC%9F"><span class="nav-number">11.8.</span> <span class="nav-text">8.try,catch捕获的是什么异常？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#9-%E5%A6%82%E6%9E%9C%E6%89%A7%E8%A1%8Cfinally%E4%BB%A3%E7%A0%81%E5%9D%97%E4%B9%8B%E5%89%8D%E8%BF%94%E5%9B%9E%E4%BA%86%E7%BB%93%E6%9E%9C%E6%88%96%E8%80%85Jvm%E9%80%80%E5%87%BA%E4%BA%86%EF%BC%8C%E6%AD%A4%E6%97%B6finally%E4%BB%A3%E7%A0%81%E5%9D%97%E8%BF%98%E4%BC%9A%E6%89%A7%E8%A1%8C%E5%90%97%EF%BC%9F"><span class="nav-number">11.9.</span> <span class="nav-text">9.如果执行finally代码块之前返回了结果或者Jvm退出了，此时finally代码块还会执行吗？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#10-try%E8%AF%AD%E5%8F%A5%E4%B8%AD%E6%9C%89return%E8%AF%AD%E5%8F%A5%EF%BC%8C%E6%9C%80%E5%90%8E%E5%86%99finally%E8%AF%AD%E5%8F%A5%EF%BC%8Cfinally%E8%AF%AD%E5%8F%A5%E4%B8%AD%E7%9A%84code%E4%BC%9A%E4%B8%8D%E4%BC%9A%E6%89%A7%E8%A1%8C%EF%BC%9F%E4%BD%95%E6%97%B6%E6%89%A7%E8%A1%8C%EF%BC%9F%E5%A6%82%E6%9E%9C%E6%89%A7%E8%A1%8C%E6%98%AF%E5%9C%A8return%E5%89%8D%E8%BF%98%E6%98%AF%E5%90%8E"><span class="nav-number">11.10.</span> <span class="nav-text">10.try语句中有return语句，最后写finally语句，finally语句中的code会不会执行？何时执行？如果执行是在return前还是后</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Alugg"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">Alugg</p>
+  <div class="site-description" itemprop="description">Step out of your comfort zone</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">10</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:lu.tian2022@gmail.com" title="E-Mail → mailto:lu.tian2022@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2023-09 – 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Alugg</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">30k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">27 分钟</span>
+</div>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
