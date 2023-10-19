@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-loading-bar.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"aluggnb.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="泛型的引入所谓泛型，就是允许在定义类、接口时通过一个标识来表示类中某个属性的类型或者是某个方法的返回值或参数的类型。这个类型参数将在使用时（例如，继承或实现这个接口、创建对象或调用方法时）确定（即传入实际的类型参数，也称为类型实参） 在集合使用泛型前可能存在的问题 问题1：类型不安全。因为add()的参数是Object类型，意味着任何类型的对象都可以添加成功 问题2：需要使用强转操作，繁琐。还有可">
+<meta property="og:type" content="article">
+<meta property="og:title" content="java-Day11——泛型">
+<meta property="og:url" content="https://aluggnb.com/2023/10/09/javaday11_generics/index.html">
+<meta property="og:site_name" content="Alugg&#39;s Blog">
+<meta property="og:description" content="泛型的引入所谓泛型，就是允许在定义类、接口时通过一个标识来表示类中某个属性的类型或者是某个方法的返回值或参数的类型。这个类型参数将在使用时（例如，继承或实现这个接口、创建对象或调用方法时）确定（即传入实际的类型参数，也称为类型实参） 在集合使用泛型前可能存在的问题 问题1：类型不安全。因为add()的参数是Object类型，意味着任何类型的对象都可以添加成功 问题2：需要使用强转操作，繁琐。还有可">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-10-09T14:18:01.000Z">
+<meta property="article:modified_time" content="2023-10-09T14:18:01.000Z">
+<meta property="article:author" content="Alugg">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://aluggnb.com/2023/10/09/javaday11_generics/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>java-Day11——泛型 | Alugg's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Alugg's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://aluggnb.com/2023/10/09/javaday11_generics/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="Alugg">
+      <meta itemprop="description" content="Step out of your comfort zone">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Alugg's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          java-Day11——泛型
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-10-09 22:18:01" itemprop="dateCreated datePublished" datetime="2023-10-09T22:18:01+08:00">2023-10-09</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>2.6k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="泛型的引入"><a href="#泛型的引入" class="headerlink" title="泛型的引入"></a>泛型的引入</h1><p>所谓泛型，就是允许在定义类、接口时通过一个<strong>标识</strong>来表示类中<strong>某个属性的类型</strong>或者是某个方法的<strong>返回值或参数的类型</strong>。这个类型参数将在使用时（例如，继承或实现这个接口、创建对象或调用方法时）确定（即传入实际的类型参数，也称为类型实参）</p>
+<h2 id=""><a href="#" class="headerlink" title=""></a></h2><p><strong>在集合使用泛型前可能存在的问题</strong></p>
+<p>问题1：类型不安全。因为add()的参数是Object类型，意味着任何类型的对象都可以添加成功</p>
+<p>问题2：需要使用强转操作，繁琐。还有可能导致ClassCastException异常</p>
+<h1 id="泛型的使用"><a href="#泛型的使用" class="headerlink" title="泛型的使用"></a>泛型的使用</h1><p><strong>使用说明</strong></p>
+<ul>
+<li>集合框架在生命接口和实现类时使用泛型，在实例化集合对象时，如果没有使用泛型，则认为操作的是Object类型的数据。如果使用了泛型，则需要指明泛型的具体类型。一旦指明了泛型的具体类型，则阿紫集合的相关的方法中，凡是使用泛型的位置，都替换为具体的泛型类型。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">GenericTest</span> &#123;</span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">test</span><span class="params">()</span>&#123;</span><br><span class="line">        List&lt;Integer&gt; list = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;Integer&gt;();</span><br><span class="line">        list.add(<span class="number">78</span>);</span><br><span class="line">        list.add(<span class="number">254</span>);</span><br><span class="line">        list.add(<span class="number">54</span>);</span><br><span class="line">        list.add(<span class="number">99</span>);</span><br><span class="line">        <span class="comment">//编译报错，保证类型安全</span></span><br><span class="line">        <span class="comment">// list.add(&quot;AA&quot;);</span></span><br><span class="line">        Iterator&lt;Integer&gt; iterator = list.iterator();</span><br><span class="line">        <span class="keyword">while</span>(iterator.hasNext())&#123;</span><br><span class="line">            <span class="comment">//因为添加的都是Integer类型，避免了强转操作</span></span><br><span class="line">            <span class="type">Integer</span> <span class="variable">i</span> <span class="operator">=</span> iterator.next();</span><br><span class="line">            <span class="type">int</span> <span class="variable">score</span> <span class="operator">=</span> i;</span><br><span class="line">            System.out.println(score);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//在map中的使用</span></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">test2</span><span class="params">()</span>&#123;</span><br><span class="line">        HashMap&lt;String, Integer&gt; map = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();<span class="comment">//类型推断</span></span><br><span class="line">        map.put(<span class="string">&quot;Tom&quot;</span>, <span class="number">12</span>);</span><br><span class="line">        map.put(<span class="string">&quot;jack&quot;</span>,<span class="number">23</span>);</span><br><span class="line">        map.put(<span class="string">&quot;hh&quot;</span>, <span class="number">24</span>);</span><br><span class="line"></span><br><span class="line">        Set&lt;Map.Entry&lt;String, Integer&gt;&gt; entreSet = map.entrySet();</span><br><span class="line">        Iterator&lt;Map.Entry&lt;String, Integer&gt;&gt; iterator = entreSet.iterator();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> (iterator.hasNext())&#123;</span><br><span class="line">            Map.Entry&lt;String, Integer&gt; entry = iterator.next();</span><br><span class="line">            <span class="type">String</span> <span class="variable">key</span> <span class="operator">=</span> entry.getKey();</span><br><span class="line">            <span class="type">Integer</span> <span class="variable">value</span> <span class="operator">=</span> entry.getValue();</span><br><span class="line">            System.out.println(key+<span class="string">&quot;--&gt;&quot;</span>+value);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="自定义泛型"><a href="#自定义泛型" class="headerlink" title="自定义泛型"></a>自定义泛型</h1><h2 id="自定义泛型类-接口"><a href="#自定义泛型类-接口" class="headerlink" title="自定义泛型类\接口"></a>自定义泛型类\接口</h2><p><strong>格式</strong></p>
+<p>class A<T>{</p>
+<p>}</p>
+<p>interface B&lt;T1,T2&gt;{</p>
+<p>}</p>
+<p><strong>使用说明：</strong></p>
+<ol>
+<li>声明完自定义泛型类以后，可以在类的内部（比如属性、方法、构造器中）使用类的泛型</li>
+<li>创建自定义泛型类的对象时，可以指明泛型参数类型。一旦指明，内部凡是所使用类的泛型参数的位置，都具体化为指定的类的泛型类型。</li>
+<li>创建自定义泛型类的对象时，没有指明泛型参数类型，那么泛型将被擦除，泛型对应的类型均安装Object处理，但不等于Object。经验：泛型要用使用一路都用，要不用，一路都不用。</li>
+<li>泛型的指定中必须使用引用数据类型。不能使用基本数据类型，此时只能使用包装类替换。</li>
+<li>除创建泛型类对象外，子类继承泛型类时、实现类实现泛型接口时，也可以确定泛型结构中的泛型参数。</li>
+</ol>
+<p>如果我们在给泛型类提供子类时，子类也不确定泛型的类型，则可以继续使用泛型参数。</p>
+<p>我们还可以再现有的父类的泛型参数的基础上，新增泛型参数</p>
+<p><strong>注意：</strong></p>
+<ol>
+<li><p>泛型类可能有多个参数，此时应将多个参数一起放在尖括号内。比如&lt;E1,E2,E3&gt;</p>
+</li>
+<li><p>JDK7开始，泛型的简化操作：ArrayList<Fruit> flist &#x3D; new ArrayList&lt;&gt;();</p>
+</li>
+<li><p>如果泛型结构是一个接口或抽象类，则不可以创建泛型类的对象</p>
+</li>
+<li><p>不能使用new E()。但是可以，E[] elements &#x3D; (E[])new Object[capacity];</p>
+</li>
+<li><p>在类&#x2F;接口上声明的泛型，在本类或本接口中即代表某种类型，但不可以在静态方法中使用类的泛型。</p>
+</li>
+<li><p>异常类不可以带泛型。</p>
+</li>
+</ol>
+<h2 id="自定义泛型方法"><a href="#自定义泛型方法" class="headerlink" title="自定义泛型方法"></a>自定义泛型方法</h2><p><strong>格式</strong>：</p>
+<p>权限修饰符 <T> 返回值类型 方法名（形参列表）{</p>
+<p>}</p>
+<p><strong>举例</strong></p>
+<p>public <E> E method(E e){</p>
+<p>}</p>
+<p><strong>说明</strong></p>
+<ul>
+<li>声明泛型方法时，一定要添加泛型参数<T></li>
+<li>泛型参数在方法调用时，指明其具体的类型</li>
+<li>泛型方法可以根据需要声明为static</li>
+<li>泛型方法所属的类是否是一个泛型类，都可以。</li>
+</ul>
+<h1 id="泛型在继承上的体现"><a href="#泛型在继承上的体现" class="headerlink" title="泛型在继承上的体现"></a>泛型在继承上的体现</h1><p>1.类SuperA是类A的父类，则G<superA>与G<A>的关系？</p>
+<p>二者是并列的两个类，没有任何子父类的关系</p>
+<p>2.类SuperA是类A的父类或接口，superA<G>与A<G>的关系？</p>
+<p>superA<G>与A<G>有继承或实现的关系。即A<G>的实例可以赋值给SuperA<G>类型的引用或变量。</p>
+<h1 id="通配符"><a href="#通配符" class="headerlink" title="通配符"></a>通配符</h1><h2 id="使用说明"><a href="#使用说明" class="headerlink" title="使用说明"></a>使用说明</h2><p>ArrayList&lt;?&gt;</p>
+<p>G<?> 可以看作是G<A>类型的父类，即可以将G<A>的对象赋值给G<?>类型的引用或变量</p>
+<h2 id="读写特点"><a href="#读写特点" class="headerlink" title="读写特点"></a>读写特点</h2><ul>
+<li>读取数据：允许的，读取的值为Object类型</li>
+<li>写入数据：不允许。特例,null</li>
+</ul>
+<h2 id="有限制条件的通配符"><a href="#有限制条件的通配符" class="headerlink" title="有限制条件的通配符"></a>有限制条件的通配符</h2><p>List&lt;? extends A&gt;:可以将List<A>或List<B>赋值给List&lt;? extends A&gt;其中B类是A类的子类</p>
+<p>List&lt;? super A&gt;：可以将List<A>或List<B>赋值给List&lt;? super A&gt;其中B类是A类的父类</p>
+<h1 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a>常见问题</h1><h2 id="Java的泛型是什么？有什么好处和优点？JDK不同版本的泛型有什么区别？"><a href="#Java的泛型是什么？有什么好处和优点？JDK不同版本的泛型有什么区别？" class="headerlink" title="Java的泛型是什么？有什么好处和优点？JDK不同版本的泛型有什么区别？"></a>Java的泛型是什么？有什么好处和优点？JDK不同版本的泛型有什么区别？</h2><p>泛型，是程序中出现的不确定的类型。</p>
+<p>以集合来举例：把一个集合中的内容限制为一个特定的数据类型，这就是generic背后的核心思想。</p>
+
+    </div>
+
+    
+    
+    
+    
+      <div>
+      <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:24px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+      </div>
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Alugg
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://aluggnb.com/2023/10/09/javaday11_generics/" title="java-Day11——泛型">https://aluggnb.com/2023/10/09/javaday11_generics/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+    
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/10/08/javaday10_collection_map/" rel="prev" title="java-Day10——集合">
+      <i class="fa fa-chevron-left"></i> java-Day10——集合
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/10/10/javaday12_codeforHashMap/" rel="next" title="java-Day12——HashMap源码">
+      java-Day12——HashMap源码 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B3%9B%E5%9E%8B%E7%9A%84%E5%BC%95%E5%85%A5"><span class="nav-number">1.</span> <span class="nav-text">泛型的引入</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">1.1.</span> <span class="nav-text"></span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B3%9B%E5%9E%8B%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="nav-number">2.</span> <span class="nav-text">泛型的使用</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B3%9B%E5%9E%8B"><span class="nav-number">3.</span> <span class="nav-text">自定义泛型</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B3%9B%E5%9E%8B%E7%B1%BB-%E6%8E%A5%E5%8F%A3"><span class="nav-number">3.1.</span> <span class="nav-text">自定义泛型类\接口</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B3%9B%E5%9E%8B%E6%96%B9%E6%B3%95"><span class="nav-number">3.2.</span> <span class="nav-text">自定义泛型方法</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B3%9B%E5%9E%8B%E5%9C%A8%E7%BB%A7%E6%89%BF%E4%B8%8A%E7%9A%84%E4%BD%93%E7%8E%B0"><span class="nav-number">4.</span> <span class="nav-text">泛型在继承上的体现</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%80%9A%E9%85%8D%E7%AC%A6"><span class="nav-number">5.</span> <span class="nav-text">通配符</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E"><span class="nav-number">5.1.</span> <span class="nav-text">使用说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%BB%E5%86%99%E7%89%B9%E7%82%B9"><span class="nav-number">5.2.</span> <span class="nav-text">读写特点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%89%E9%99%90%E5%88%B6%E6%9D%A1%E4%BB%B6%E7%9A%84%E9%80%9A%E9%85%8D%E7%AC%A6"><span class="nav-number">5.3.</span> <span class="nav-text">有限制条件的通配符</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98"><span class="nav-number">6.</span> <span class="nav-text">常见问题</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Java%E7%9A%84%E6%B3%9B%E5%9E%8B%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F%E6%9C%89%E4%BB%80%E4%B9%88%E5%A5%BD%E5%A4%84%E5%92%8C%E4%BC%98%E7%82%B9%EF%BC%9FJDK%E4%B8%8D%E5%90%8C%E7%89%88%E6%9C%AC%E7%9A%84%E6%B3%9B%E5%9E%8B%E6%9C%89%E4%BB%80%E4%B9%88%E5%8C%BA%E5%88%AB%EF%BC%9F"><span class="nav-number">6.1.</span> <span class="nav-text">Java的泛型是什么？有什么好处和优点？JDK不同版本的泛型有什么区别？</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Alugg"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">Alugg</p>
+  <div class="site-description" itemprop="description">Step out of your comfort zone</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">20</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:lu.tian2022@gmail.com" title="E-Mail → mailto:lu.tian2022@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2023-09 – 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Alugg</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">111k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">1:40</span>
+</div>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-loading-bar.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"aluggnb.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="数据结构定义数据结构就是一种程序设计优化方法论，研究数据的“逻辑结构“和”物理结构”以及它们之间相互关系，并对这种结构定义相应的”运算，目的是加快程序的执行速度、减少内存的占用空间 研究对象研究对象1：数据之间的逻辑关系  集合结构  线性结构：一对一  树形结构：一对多  图形结构：多对多   研究对象2：数据的存储结构  顺序结构 链式结构 索引结构 散列结构  开发中，更习惯于如下的方式理解">
+<meta property="og:type" content="article">
+<meta property="og:title" content="java-Day12——HashMap源码">
+<meta property="og:url" content="https://aluggnb.com/2023/10/10/javaday12_codeforHashMap/index.html">
+<meta property="og:site_name" content="Alugg&#39;s Blog">
+<meta property="og:description" content="数据结构定义数据结构就是一种程序设计优化方法论，研究数据的“逻辑结构“和”物理结构”以及它们之间相互关系，并对这种结构定义相应的”运算，目的是加快程序的执行速度、减少内存的占用空间 研究对象研究对象1：数据之间的逻辑关系  集合结构  线性结构：一对一  树形结构：一对多  图形结构：多对多   研究对象2：数据的存储结构  顺序结构 链式结构 索引结构 散列结构  开发中，更习惯于如下的方式理解">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-10-10T11:18:01.000Z">
+<meta property="article:modified_time" content="2023-10-10T11:18:01.000Z">
+<meta property="article:author" content="Alugg">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://aluggnb.com/2023/10/10/javaday12_codeforHashMap/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>java-Day12——HashMap源码 | Alugg's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Alugg's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://aluggnb.com/2023/10/10/javaday12_codeforHashMap/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="Alugg">
+      <meta itemprop="description" content="Step out of your comfort zone">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Alugg's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          java-Day12——HashMap源码
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-10-10 19:18:01" itemprop="dateCreated datePublished" datetime="2023-10-10T19:18:01+08:00">2023-10-10</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>6.1k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>6 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="数据结构"><a href="#数据结构" class="headerlink" title="数据结构"></a>数据结构</h1><h2 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h2><p>数据结构就是一种程序设计优化方法论，研究数据的“逻辑结构“和”物理结构”以及它们之间相互关系，并对这种结构定义相应的”运算，目的是加快程序的执行速度、减少内存的占用空间</p>
+<h2 id="研究对象"><a href="#研究对象" class="headerlink" title="研究对象"></a>研究对象</h2><p><strong>研究对象1：数据之间的逻辑关系</strong></p>
+<ul>
+<li><p>集合结构</p>
+</li>
+<li><p>线性结构：一对一</p>
+</li>
+<li><p>树形结构：一对多</p>
+</li>
+<li><p>图形结构：多对多</p>
+</li>
+</ul>
+<p><strong>研究对象2：数据的存储结构</strong></p>
+<ul>
+<li>顺序结构</li>
+<li>链式结构</li>
+<li>索引结构</li>
+<li>散列结构</li>
+</ul>
+<p>开发中，更习惯于如下的方式理解存储结构</p>
+<ul>
+<li>线性表（一对一）：一维数组、单向链表、双向链表、栈、队列</li>
+<li>树（一对多）：各种树。 二叉树、B+树</li>
+<li>图（多对多）：</li>
+<li>哈希表：HashMap、HashSet</li>
+</ul>
+<p>研究对象3：相关算法操作</p>
+<ul>
+<li><p>分配资源、建立结构、释放资源</p>
+</li>
+<li><p>插入和删除</p>
+</li>
+<li><p>获取和遍历</p>
+</li>
+<li><p>修改和排序</p>
+</li>
+</ul>
+<h1 id="存储结构"><a href="#存储结构" class="headerlink" title="存储结构"></a>存储结构</h1><h2 id="数组"><a href="#数组" class="headerlink" title="数组"></a>数组</h2><h2 id="链表"><a href="#链表" class="headerlink" title="链表"></a>链表</h2><p><strong>单向链表</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Node</span>&#123;</span><br><span class="line"></span><br><span class="line">	Object data;</span><br><span class="line"></span><br><span class="line">	Node next;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">Node</span><span class="params">(Object data)</span>&#123;</span><br><span class="line">        <span class="built_in">this</span>.data = data;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">Node</span> <span class="variable">node1</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Node</span>(<span class="string">&quot;AA&quot;</span>);</span><br><span class="line"><span class="type">Node</span> <span class="variable">node2</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Node</span>(<span class="string">&quot;BB&quot;</span>);</span><br><span class="line">node1.next = node2;</span><br></pre></td></tr></table></figure>
+
+<p><strong>双向链表</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Node</span>&#123;</span><br><span class="line">	Node prev;</span><br><span class="line">	Object data;</span><br><span class="line">	Node next;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">Node</span><span class="params">(Object data)</span>&#123;</span><br><span class="line">        <span class="built_in">this</span>.data = data;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">Node</span><span class="params">(Node prev, Object data, Node next)</span>&#123;</span><br><span class="line">        <span class="built_in">this</span>.prev = prev;</span><br><span class="line">        <span class="built_in">this</span>.data = data;</span><br><span class="line">        <span class="built_in">this</span>.next = next;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="type">Node</span> <span class="variable">node1</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Node</span>(<span class="literal">null</span>, <span class="string">&quot;aa&quot;</span>, <span class="literal">null</span>);</span><br><span class="line"><span class="type">Node</span> <span class="variable">node2</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Node</span>(node1, <span class="string">&quot;bb&quot;</span>, <span class="literal">null</span>);</span><br><span class="line"><span class="type">Node</span> <span class="variable">node3</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Node</span>(node2,<span class="string">&quot;cc&quot;</span>, <span class="literal">null</span>);</span><br><span class="line"></span><br><span class="line">node1.next = node2;</span><br><span class="line">node2.next = node3;</span><br></pre></td></tr></table></figure>
+
+<h2 id="二叉树"><a href="#二叉树" class="headerlink" title="二叉树"></a>二叉树</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">class TreeNode&#123;</span><br><span class="line">	TreeNode parent; </span><br><span class="line">	TreeNode left;</span><br><span class="line">	Object data;</span><br><span class="line">	TreeNode right;</span><br><span class="line">	</span><br><span class="line">	public TreeNode(Object data)&#123;</span><br><span class="line">		this.data = data;</span><br><span class="line">	&#125;</span><br><span class="line">	public TreeNode(TreeNode left, Object data, TreeNode right)&#123;</span><br><span class="line">		this.left =left;</span><br><span class="line">		this.data = data;</span><br><span class="line">		this.right=right;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">TreeNode node1 = new TreeNode(null, null,&quot;AA&quot;, null);</span><br><span class="line">TreeNode leftNode = new TreeNode(node1, null,&quot;bb&quot;, null);</span><br><span class="line">TreeNode rightNode = new TreeNode(node1, null,&quot;cc&quot;, null);</span><br><span class="line">node1.right = rightNode;</span><br><span class="line">node1.left = leftNode;</span><br></pre></td></tr></table></figure>
+
+<h2 id="栈FILO"><a href="#栈FILO" class="headerlink" title="栈FILO"></a>栈FILO</h2><ul>
+<li>属于抽象数据类型（ADT）</li>
+<li>可以使用数组或链表来构建</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Stack</span>&#123;</span><br><span class="line">    <span class="comment">//数组实现栈</span></span><br><span class="line">    Object[] values</span><br><span class="line">    <span class="type">int</span> size;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">Stack</span><span class="params">(<span class="type">int</span> length)</span>&#123;</span><br><span class="line">        values = <span class="keyword">new</span> <span class="title class_">Object</span>[length];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">push</span><span class="params">(Object ele)</span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(size&gt;=values.length)&#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">RuntimeException</span>(<span class="string">&quot;栈空间已满&quot;</span>)</span><br><span class="line">        &#125;</span><br><span class="line">        values[size]=ele;</span><br><span class="line">        size++;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> Object <span class="title function_">pop</span><span class="params">()</span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(size &lt;=<span class="number">0</span>)&#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">RuntimeException</span>(<span class="string">&quot;栈空间已空&quot;</span>)</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="type">Object</span> <span class="variable">obj</span> <span class="operator">=</span> values[size-<span class="number">1</span>];</span><br><span class="line">        values[size-<span class="number">1</span>] = <span class="literal">null</span>;</span><br><span class="line">        size--;</span><br><span class="line">        <span class="keyword">return</span> obj;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="队列FIFO"><a href="#队列FIFO" class="headerlink" title="队列FIFO"></a>队列FIFO</h2><ul>
+<li>属于抽象数据类型（ADT）</li>
+<li>可以使用数组或链表来构建</li>
+</ul>
+<p>class Stack{<br>    &#x2F;&#x2F;数组实现栈<br>    Object[] values<br>    int size;</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Queue</span>&#123;</span><br><span class="line">    Object[] values;</span><br><span class="line">    <span class="type">int</span> size;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">Queue</span><span class="params">(<span class="type">int</span> lenght)</span>&#123;</span><br><span class="line">        values = <span class="keyword">new</span> <span class="title class_">Object</span>[length];</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">add</span><span class="params">(Object ele)</span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(size&gt;= values.length)&#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">RuntimeException</span>(<span class="string">&quot;队列已满，添加失败&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        values[size] = ele;</span><br><span class="line">        size ++;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> Object <span class="title function_">get</span><span class="params">()</span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(size&lt;=<span class="number">0</span>)&#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">RuntimeException</span>(<span class="string">&quot;队列已空，获取失败&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="type">Object</span> <span class="variable">obj</span> <span class="operator">=</span> values[<span class="number">0</span>];</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> i= <span class="number">0</span>;i&lt;size-<span class="number">1</span>;i++)&#123;</span><br><span class="line">            values[i] = values[i+<span class="number">1</span>];</span><br><span class="line">        &#125;</span><br><span class="line">        values[size - <span class="number">1</span>] = <span class="literal">null</span>;</span><br><span class="line">        size --;</span><br><span class="line">        <span class="keyword">return</span> obj;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="List源码"><a href="#List源码" class="headerlink" title="List源码"></a>List源码</h1><h2 id="ArrayList"><a href="#ArrayList" class="headerlink" title="ArrayList"></a>ArrayList</h2><p><strong>ArrayList特点</strong></p>
+<ul>
+<li>实现了List接口，存储有序、可以重复的数据</li>
+<li>底层使用Object[]数组存储</li>
+<li>线程不安全</li>
+</ul>
+<p><strong>ArrayList源码解析</strong></p>
+<p><strong>jdk7</strong>: 如下代码执行：底层会初始化数组，数组的长度为10。Object[] elementData &#x3D; new Object[10]</p>
+<p>ArrayList<String> list &#x3D; new ArrayList&lt;&gt;()</p>
+<p>list.add(“AA”);&#x2F;&#x2F;elementData[0] &#x3D; “AA”;</p>
+<p>list.add(“BB”); &#x2F;&#x2F;elementData[1] &#x3D; “BB”;</p>
+<p>…..</p>
+<p>当添加第11个元素时，底层elementData数组已满，则需要扩容。默认扩容为原来长度的1.5倍。并将原有数组中的元素赋值到新的数组中</p>
+<p>**jdk8:**底层会初始化数组，即：Object[] elementData&#x3D; new Object[]{};</p>
+<p>ArrayList<String> list &#x3D; new ArrayList&lt;&gt;();</p>
+<p>list.add(“AA”);&#x2F;&#x2F;首次添加元素，会初始化数组 elementData &#x3D; new Object[10]; elementData[0] &#x3D; “AA”;</p>
+<p>list.add(“BB”);&#x2F;&#x2F;elementData[1] &#x3D; “BB”;</p>
+<p>当添加第11个元素时，底层elementData数组已满，则需要扩容。默认扩容为原来长度的1.5倍。并将原有数组中的元素赋值到新的数组中</p>
+<h2 id=""><a href="#" class="headerlink" title=""></a></h2><p><strong>小结</strong></p>
+<p>jdk7中类似于饿汉式</p>
+<p>jdk8中类似于懒汉式</p>
+<h2 id="Vector"><a href="#Vector" class="headerlink" title="Vector"></a>Vector</h2><p><strong>特点</strong></p>
+<ul>
+<li>实现了List接口，存储有序、可以重复的数据</li>
+<li>底层使用了Object[]数组存储</li>
+<li>线程安全</li>
+</ul>
+<p><strong>源码</strong></p>
+<p>Vector v &#x3D; new Vector();&#x2F;&#x2F;底层初始化数组，长度为10 Object[] element &#x3D; new Object[10];</p>
+<p>v.add(“aa”);</p>
+<p>v.add(“bb”);</p>
+<p>当前添加第11个元素时，扩容2倍</p>
+<h2 id="LinkedList"><a href="#LinkedList" class="headerlink" title="LinkedList"></a>LinkedList</h2><p><strong>特点</strong></p>
+<ul>
+<li>实现List接口，存储有序、可以重复的数据</li>
+<li>底层使用了双向链表存储</li>
+<li>线程不安全</li>
+</ul>
+<p><strong>源码</strong></p>
+<p>LinkedList<String> list &#x3D; new LinkedList&lt;&gt;(); &#x2F;&#x2F;底层也没做啥</p>
+<p>list.add(“AA”);&#x2F;&#x2F;将“AA”封装到一个Node对象中，list对象的属性first、last都指向次node对象。</p>
+<p>list.add(“BB”);&#x2F;&#x2F;将“BB”封装到一个Node对象2中，对象1和对象2构成一个双向链表，同时last指向此Node对象2  </p>
+<p>…..</p>
+<p>因为linkedList使用的是双向链表，不需要考虑扩容问题。</p>
+<h2 id="启示"><a href="#启示" class="headerlink" title="启示"></a>启示</h2><p>1.Vector不使用了</p>
+<p>2.ArrayList底层使用数组结构，查找和添加（尾部添加）操作效率高，时间复杂度为O（1）</p>
+<p>删除和插入操作效率低，时间复杂度为O（n)</p>
+<p>LinkedList底层使用双向链表，删除和插入操作效率高，时间复杂度O（1）</p>
+<p>查找和添加（尾部添加）操作效率低，时间为O（n)（添加可能O(1))</p>
+<p>3.在选择了ArrayList的前提下，new ArrayList()：底层创建长度为10的数组。</p>
+<p>new ArrayList(int capacity):底层创建指定capacity长度的数组。</p>
+<h1 id="Map源码"><a href="#Map源码" class="headerlink" title="Map源码"></a>Map源码</h1><h2 id="HashMap源码解析"><a href="#HashMap源码解析" class="headerlink" title="HashMap源码解析"></a>HashMap源码解析</h2><p><strong>jdk7:</strong></p>
+<p>&#x2F;&#x2F;创建对象的过程中，底层会初始化数组Entry[] table &#x3D; new Entry[16];</p>
+<p>HashMap&lt;String, Integer&gt; map &#x3D; new HashMap&lt;&gt;();</p>
+<p>map.put(“AA”, 78); &#x2F;&#x2F;“AA”和78封装到一个Entry对象总，考虑将此对象添加到table数组中。</p>
+<p>…</p>
+<p>添加&#x2F;修改的过程:</p>
+<p>将（key1,value1)添加到当前的map中</p>
+<p>首先，需要调用key所在类的hashCode()方法，计算key1对应的哈希值1，此哈希值1经过某种算法（hash())之后，得到哈希值2。</p>
+<p>哈希值2再经过某种算法（indexFor())之后，就确定了(key1,value1)在数组table中的索引位置i。</p>
+<ul>
+<li>如果此索引位置i的数组上没有元素，则（key1,value1)添加成功  —&gt;情况1</li>
+<li>如果此缩影位置i的数组上有元素（key2,value2),则需要继续比较key1和key2的哈希值2  —&gt;哈希冲突<ul>
+<li>如果key1的哈希值2与key2的哈希值2不相同，则(key1,value1)添加成功。  —-&gt;情况2</li>
+<li>如果key1的哈希值2与key2的哈哈希值2相同，则需要继续比较key1和key2的equals()。要调用key1所在类的equals(),将key2作为参数传递进去<ul>
+<li>调用equals()，返回false:则（key1,value1)添加成功  —-&gt;情况3</li>
+<li>调用equals(),返回true:则认为key1和key2是相同的。默认情况下，value1替换原有的value2.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p><strong>说明</strong>：</p>
+<ul>
+<li>情况1：将（key1, value1)存放到数组的索引i的位置</li>
+<li>情况2，情况3：（key1,value1)元素与现有的（key2, value2)构成单向链表结构，（key1,value1)指向（key2,value2)</li>
+</ul>
+<p>随着不断的添加元素，在满足如下的条件的情况下，会考虑扩容：</p>
+<p>（size&gt;&#x3D; threshold) &amp;&amp;(null !&#x3D;table[i])</p>
+<p>当元素的个数达到临界值（-&gt;数组的长度* 加载因子）时，就考虑扩容。 默认的临界值 &#x3D; 16*0.75 –》12.</p>
+<p>默认扩容为原来的两倍</p>
+<p><strong>jdk8与jdk7的不同之处</strong></p>
+<ol>
+<li>在jdk8中，当我面创建了HashMap实例以后，底层并没有初始化table数组。当首次添加(key,value)时，进行判断，如果发现table尚未初始化，则对数组进行初始化。</li>
+<li>在jdk8中，HashMap底层定义类Node内部类，替换了jdk7中的Entry内部类。意味着，我们创建的数组是Node[]</li>
+<li>jdk8中，当前的(key,value)经过一系列判断之后，可以添加到当前的数组的角标i中。如果此时角标i位置上有元素。在jdk7中是将新的（key,value)指向已有的旧的元素（头插法）。而在jdk8中旧的元素指向新的（key,value)元素（尾插法）</li>
+<li>jdk7：数组+单向链表；jdk8:数组+单向链表+红黑树。</li>
+</ol>
+<p>​		什么时候会使用红黑树：如果数组索引i位置上的元素的个数达到8，并且数组的长度达到64时，我们就将此索引i位置上的多个元素改为使用红黑树的结构进行存储。 （为什么修改呢？红黑树进行put()&#x2F;get()&#x2F;remove()，操作的时间复杂度为O（logn),比单向链表的时间复杂度O(n)的好。性能高。</p>
+<p>​		什么时候会使用红黑树变为单向链表：当使用红黑树的索引i位置上的元素的个数小于6时，就会将红黑树退化为单向链表。</p>
+<h2 id="LinkedHashMap"><a href="#LinkedHashMap" class="headerlink" title="LinkedHashMap"></a>LinkedHashMap</h2><p>LinkedHashMap是HashMap的子类</p>
+<p>使用的数组+单向链表+红黑树的基础上，又增加了一对双向链表，记录添加的（key,value)的先后顺序。便于我们遍历所有的key-value。</p>
+<p>重写了增加方法。</p>
+<h2 id="HashSet和LinkedHashSet源码分析"><a href="#HashSet和LinkedHashSet源码分析" class="headerlink" title="HashSet和LinkedHashSet源码分析"></a>HashSet和LinkedHashSet源码分析</h2><ul>
+<li>HashSet底层使用HashMap</li>
+<li>LinkedHashSet使用的是LinkedHashMap</li>
+</ul>
+<h1 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a>常见问题</h1><h2 id="链表和数组的区别？"><a href="#链表和数组的区别？" class="headerlink" title="链表和数组的区别？"></a>链表和数组的区别？</h2><h2 id="栈是如何运行的？"><a href="#栈是如何运行的？" class="headerlink" title="栈是如何运行的？"></a>栈是如何运行的？</h2><h2 id="ArraList的默认大小是多少，以及扩容机制"><a href="#ArraList的默认大小是多少，以及扩容机制" class="headerlink" title="ArraList的默认大小是多少，以及扩容机制"></a>ArraList的默认大小是多少，以及扩容机制</h2><h2 id="ArraList的底层是怎么实现的"><a href="#ArraList的底层是怎么实现的" class="headerlink" title="ArraList的底层是怎么实现的"></a>ArraList的底层是怎么实现的</h2><h2 id="数组和ArrayList的区别"><a href="#数组和ArrayList的区别" class="headerlink" title="数组和ArrayList的区别"></a>数组和ArrayList的区别</h2><p>ArrayList看作是对数组的常见操作的封装</p>
+<h2 id="什么是线程安全的List"><a href="#什么是线程安全的List" class="headerlink" title="什么是线程安全的List"></a>什么是线程安全的List</h2><h2 id="HashMap初始值16，临界值12是怎么算的"><a href="#HashMap初始值16，临界值12是怎么算的" class="headerlink" title="HashMap初始值16，临界值12是怎么算的"></a>HashMap初始值16，临界值12是怎么算的</h2><h2 id="HashMap长度为什么是2的幂"><a href="#HashMap长度为什么是2的幂" class="headerlink" title="HashMap长度为什么是2的幂"></a>HashMap长度为什么是2的幂</h2><p>为了方便计算要添加的元素的底层的索引i</p>
+<h2 id="HashMap怎么计算哈是在和索引？扩容机制？解决Hash冲突"><a href="#HashMap怎么计算哈是在和索引？扩容机制？解决Hash冲突" class="headerlink" title="HashMap怎么计算哈是在和索引？扩容机制？解决Hash冲突"></a>HashMap怎么计算哈是在和索引？扩容机制？解决Hash冲突</h2><h2 id="HashMap底层为什么加链表？"><a href="#HashMap底层为什么加链表？" class="headerlink" title="HashMap底层为什么加链表？"></a>HashMap底层为什么加链表？</h2><p>因为有哈斯冲突。解决方案，使用链表的方式。保证要添加的元素仍然在索引i的位置上</p>
+<h2 id="HashMap为什么长度达到一定的长度要转化为红黑树？"><a href="#HashMap为什么长度达到一定的长度要转化为红黑树？" class="headerlink" title="HashMap为什么长度达到一定的长度要转化为红黑树？"></a>HashMap为什么长度达到一定的长度要转化为红黑树？</h2><h2 id="HashMap的get-原理？"><a href="#HashMap的get-原理？" class="headerlink" title="HashMap的get()原理？"></a>HashMap的get()原理？</h2><h2 id="hashCode-与equals-生产算法，方法怎么重写？"><a href="#hashCode-与equals-生产算法，方法怎么重写？" class="headerlink" title="hashCode()与equals()生产算法，方法怎么重写？"></a>hashCode()与equals()生产算法，方法怎么重写？</h2><p>进行equals()判断使用的属性，通常也都会参与到hashCode()的计算中。尽量保证hashCode()的一致性。</p>
+<h2 id="equals与-的区别，equals相等hash值一定相等吗？hash值相等equals一定相等吗？"><a href="#equals与-的区别，equals相等hash值一定相等吗？hash值相等equals一定相等吗？" class="headerlink" title="equals与&#x3D;&#x3D;的区别，equals相等hash值一定相等吗？hash值相等equals一定相等吗？"></a>equals与&#x3D;&#x3D;的区别，equals相等hash值一定相等吗？hash值相等equals一定相等吗？</h2>
+    </div>
+
+    
+    
+    
+    
+      <div>
+      <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:24px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+      </div>
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Alugg
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://aluggnb.com/2023/10/10/javaday12_codeforHashMap/" title="java-Day12——HashMap源码">https://aluggnb.com/2023/10/10/javaday12_codeforHashMap/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+    
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/10/09/javaday11_generics/" rel="prev" title="java-Day11——泛型">
+      <i class="fa fa-chevron-left"></i> java-Day11——泛型
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/10/11/javaday13_IO/" rel="next" title="java-Day13——IO">
+      java-Day13——IO <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84"><span class="nav-number">1.</span> <span class="nav-text">数据结构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9A%E4%B9%89"><span class="nav-number">1.1.</span> <span class="nav-text">定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A0%94%E7%A9%B6%E5%AF%B9%E8%B1%A1"><span class="nav-number">1.2.</span> <span class="nav-text">研究对象</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84"><span class="nav-number">2.</span> <span class="nav-text">存储结构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E7%BB%84"><span class="nav-number">2.1.</span> <span class="nav-text">数组</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%93%BE%E8%A1%A8"><span class="nav-number">2.2.</span> <span class="nav-text">链表</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E5%8F%89%E6%A0%91"><span class="nav-number">2.3.</span> <span class="nav-text">二叉树</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A0%88FILO"><span class="nav-number">2.4.</span> <span class="nav-text">栈FILO</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%98%9F%E5%88%97FIFO"><span class="nav-number">2.5.</span> <span class="nav-text">队列FIFO</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#List%E6%BA%90%E7%A0%81"><span class="nav-number">3.</span> <span class="nav-text">List源码</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#ArrayList"><span class="nav-number">3.1.</span> <span class="nav-text">ArrayList</span></a></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">3.2.</span> <span class="nav-text"></span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Vector"><span class="nav-number">3.3.</span> <span class="nav-text">Vector</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#LinkedList"><span class="nav-number">3.4.</span> <span class="nav-text">LinkedList</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%AF%E7%A4%BA"><span class="nav-number">3.5.</span> <span class="nav-text">启示</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Map%E6%BA%90%E7%A0%81"><span class="nav-number">4.</span> <span class="nav-text">Map源码</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#HashMap%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90"><span class="nav-number">4.1.</span> <span class="nav-text">HashMap源码解析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#LinkedHashMap"><span class="nav-number">4.2.</span> <span class="nav-text">LinkedHashMap</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HashSet%E5%92%8CLinkedHashSet%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90"><span class="nav-number">4.3.</span> <span class="nav-text">HashSet和LinkedHashSet源码分析</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98"><span class="nav-number">5.</span> <span class="nav-text">常见问题</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%93%BE%E8%A1%A8%E5%92%8C%E6%95%B0%E7%BB%84%E7%9A%84%E5%8C%BA%E5%88%AB%EF%BC%9F"><span class="nav-number">5.1.</span> <span class="nav-text">链表和数组的区别？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A0%88%E6%98%AF%E5%A6%82%E4%BD%95%E8%BF%90%E8%A1%8C%E7%9A%84%EF%BC%9F"><span class="nav-number">5.2.</span> <span class="nav-text">栈是如何运行的？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ArraList%E7%9A%84%E9%BB%98%E8%AE%A4%E5%A4%A7%E5%B0%8F%E6%98%AF%E5%A4%9A%E5%B0%91%EF%BC%8C%E4%BB%A5%E5%8F%8A%E6%89%A9%E5%AE%B9%E6%9C%BA%E5%88%B6"><span class="nav-number">5.3.</span> <span class="nav-text">ArraList的默认大小是多少，以及扩容机制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ArraList%E7%9A%84%E5%BA%95%E5%B1%82%E6%98%AF%E6%80%8E%E4%B9%88%E5%AE%9E%E7%8E%B0%E7%9A%84"><span class="nav-number">5.4.</span> <span class="nav-text">ArraList的底层是怎么实现的</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E7%BB%84%E5%92%8CArrayList%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">5.5.</span> <span class="nav-text">数组和ArrayList的区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8%E7%9A%84List"><span class="nav-number">5.6.</span> <span class="nav-text">什么是线程安全的List</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HashMap%E5%88%9D%E5%A7%8B%E5%80%BC16%EF%BC%8C%E4%B8%B4%E7%95%8C%E5%80%BC12%E6%98%AF%E6%80%8E%E4%B9%88%E7%AE%97%E7%9A%84"><span class="nav-number">5.7.</span> <span class="nav-text">HashMap初始值16，临界值12是怎么算的</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HashMap%E9%95%BF%E5%BA%A6%E4%B8%BA%E4%BB%80%E4%B9%88%E6%98%AF2%E7%9A%84%E5%B9%82"><span class="nav-number">5.8.</span> <span class="nav-text">HashMap长度为什么是2的幂</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HashMap%E6%80%8E%E4%B9%88%E8%AE%A1%E7%AE%97%E5%93%88%E6%98%AF%E5%9C%A8%E5%92%8C%E7%B4%A2%E5%BC%95%EF%BC%9F%E6%89%A9%E5%AE%B9%E6%9C%BA%E5%88%B6%EF%BC%9F%E8%A7%A3%E5%86%B3Hash%E5%86%B2%E7%AA%81"><span class="nav-number">5.9.</span> <span class="nav-text">HashMap怎么计算哈是在和索引？扩容机制？解决Hash冲突</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HashMap%E5%BA%95%E5%B1%82%E4%B8%BA%E4%BB%80%E4%B9%88%E5%8A%A0%E9%93%BE%E8%A1%A8%EF%BC%9F"><span class="nav-number">5.10.</span> <span class="nav-text">HashMap底层为什么加链表？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HashMap%E4%B8%BA%E4%BB%80%E4%B9%88%E9%95%BF%E5%BA%A6%E8%BE%BE%E5%88%B0%E4%B8%80%E5%AE%9A%E7%9A%84%E9%95%BF%E5%BA%A6%E8%A6%81%E8%BD%AC%E5%8C%96%E4%B8%BA%E7%BA%A2%E9%BB%91%E6%A0%91%EF%BC%9F"><span class="nav-number">5.11.</span> <span class="nav-text">HashMap为什么长度达到一定的长度要转化为红黑树？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HashMap%E7%9A%84get-%E5%8E%9F%E7%90%86%EF%BC%9F"><span class="nav-number">5.12.</span> <span class="nav-text">HashMap的get()原理？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#hashCode-%E4%B8%8Eequals-%E7%94%9F%E4%BA%A7%E7%AE%97%E6%B3%95%EF%BC%8C%E6%96%B9%E6%B3%95%E6%80%8E%E4%B9%88%E9%87%8D%E5%86%99%EF%BC%9F"><span class="nav-number">5.13.</span> <span class="nav-text">hashCode()与equals()生产算法，方法怎么重写？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#equals%E4%B8%8E-%E7%9A%84%E5%8C%BA%E5%88%AB%EF%BC%8Cequals%E7%9B%B8%E7%AD%89hash%E5%80%BC%E4%B8%80%E5%AE%9A%E7%9B%B8%E7%AD%89%E5%90%97%EF%BC%9Fhash%E5%80%BC%E7%9B%B8%E7%AD%89equals%E4%B8%80%E5%AE%9A%E7%9B%B8%E7%AD%89%E5%90%97%EF%BC%9F"><span class="nav-number">5.14.</span> <span class="nav-text">equals与&#x3D;&#x3D;的区别，equals相等hash值一定相等吗？hash值相等equals一定相等吗？</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Alugg"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">Alugg</p>
+  <div class="site-description" itemprop="description">Step out of your comfort zone</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">20</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:lu.tian2022@gmail.com" title="E-Mail → mailto:lu.tian2022@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2023-09 – 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Alugg</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">111k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">1:40</span>
+</div>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
