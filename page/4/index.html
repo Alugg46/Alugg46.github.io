@@ -155,6 +155,395 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://aluggnb.com/2023/10/10/javaday12_codeforHashMap/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="Alugg">
+      <meta itemprop="description" content="Step out of your comfort zone">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Alugg's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/10/10/javaday12_codeforHashMap/" class="post-title-link" itemprop="url">java-Day12——HashMap源码</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-10-10 19:18:01" itemprop="dateCreated datePublished" datetime="2023-10-10T19:18:01+08:00">2023-10-10</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>6.1k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>6 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="数据结构"><a href="#数据结构" class="headerlink" title="数据结构"></a>数据结构</h1><h2 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h2><p>数据结构就是一种程序设计优化方法论，研究数据的“逻辑结构“和”物理结构”以及它们之间相互关系，并对这种结构定义相应的”运算，目的是加快程序的执行速度、减少内存的占用空间</p>
+<h2 id="研究对象"><a href="#研究对象" class="headerlink" title="研究对象"></a>研究对象</h2><p><strong>研究对象1：数据之间的逻辑关系</strong></p>
+<ul>
+<li><p>集合结构</p>
+</li>
+<li><p>线性结构：一对一</p>
+</li>
+<li><p>树形结构：一对多</p>
+</li>
+<li><p>图形结构：多对多</p>
+</li>
+</ul>
+<p><strong>研究对象2：数据的存储结构</strong></p>
+<ul>
+<li>顺序结构</li>
+<li>链式结构</li>
+<li>索引结构</li>
+<li>散列结构</li>
+</ul>
+<p>开发中，更习惯于如下的方式理解存储结构</p>
+<ul>
+<li>线性表（一对一）：一维数组、单向链表、双向链表、栈、队列</li>
+<li>树（一对多）：各种树。 二叉树、B+树</li>
+<li>图（多对多）：</li>
+<li>哈希表：HashMap、HashSet</li>
+</ul>
+<p>研究对象3：相关算法操作</p>
+<ul>
+<li><p>分配资源、建立结构、释放资源</p>
+</li>
+<li><p>插入和删除</p>
+</li>
+<li><p>获取和遍历</p>
+</li>
+<li><p>修改和排序</p>
+</li>
+</ul>
+<h1 id="存储结构"><a href="#存储结构" class="headerlink" title="存储结构"></a>存储结构</h1><h2 id="数组"><a href="#数组" class="headerlink" title="数组"></a>数组</h2><h2 id="链表"><a href="#链表" class="headerlink" title="链表"></a>链表</h2><p><strong>单向链表</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Node</span>&#123;</span><br><span class="line"></span><br><span class="line">	Object data;</span><br><span class="line"></span><br><span class="line">	Node next;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">Node</span><span class="params">(Object data)</span>&#123;</span><br><span class="line">        <span class="built_in">this</span>.data = data;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">Node</span> <span class="variable">node1</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Node</span>(<span class="string">&quot;AA&quot;</span>);</span><br><span class="line"><span class="type">Node</span> <span class="variable">node2</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Node</span>(<span class="string">&quot;BB&quot;</span>);</span><br><span class="line">node1.next = node2;</span><br></pre></td></tr></table></figure>
+
+<p><strong>双向链表</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Node</span>&#123;</span><br><span class="line">	Node prev;</span><br><span class="line">	Object data;</span><br><span class="line">	Node next;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">Node</span><span class="params">(Object data)</span>&#123;</span><br><span class="line">        <span class="built_in">this</span>.data = data;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">Node</span><span class="params">(Node prev, Object data, Node next)</span>&#123;</span><br><span class="line">        <span class="built_in">this</span>.prev = prev;</span><br><span class="line">        <span class="built_in">this</span>.data = data;</span><br><span class="line">        <span class="built_in">this</span>.next = next;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="type">Node</span> <span class="variable">node1</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Node</span>(<span class="literal">null</span>, <span class="string">&quot;aa&quot;</span>, <span class="literal">null</span>);</span><br><span class="line"><span class="type">Node</span> <span class="variable">node2</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Node</span>(node1, <span class="string">&quot;bb&quot;</span>, <span class="literal">null</span>);</span><br><span class="line"><span class="type">Node</span> <span class="variable">node3</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Node</span>(node2,<span class="string">&quot;cc&quot;</span>, <span class="literal">null</span>);</span><br><span class="line"></span><br><span class="line">node1.next = node2;</span><br><span class="line">node2.next = node3;</span><br></pre></td></tr></table></figure>
+
+<h2 id="二叉树"><a href="#二叉树" class="headerlink" title="二叉树"></a>二叉树</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">class TreeNode&#123;</span><br><span class="line">	TreeNode parent; </span><br><span class="line">	TreeNode left;</span><br><span class="line">	Object data;</span><br><span class="line">	TreeNode right;</span><br><span class="line">	</span><br><span class="line">	public TreeNode(Object data)&#123;</span><br><span class="line">		this.data = data;</span><br><span class="line">	&#125;</span><br><span class="line">	public TreeNode(TreeNode left, Object data, TreeNode right)&#123;</span><br><span class="line">		this.left =left;</span><br><span class="line">		this.data = data;</span><br><span class="line">		this.right=right;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">TreeNode node1 = new TreeNode(null, null,&quot;AA&quot;, null);</span><br><span class="line">TreeNode leftNode = new TreeNode(node1, null,&quot;bb&quot;, null);</span><br><span class="line">TreeNode rightNode = new TreeNode(node1, null,&quot;cc&quot;, null);</span><br><span class="line">node1.right = rightNode;</span><br><span class="line">node1.left = leftNode;</span><br></pre></td></tr></table></figure>
+
+<h2 id="栈FILO"><a href="#栈FILO" class="headerlink" title="栈FILO"></a>栈FILO</h2><ul>
+<li>属于抽象数据类型（ADT）</li>
+<li>可以使用数组或链表来构建</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Stack</span>&#123;</span><br><span class="line">    <span class="comment">//数组实现栈</span></span><br><span class="line">    Object[] values</span><br><span class="line">    <span class="type">int</span> size;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">Stack</span><span class="params">(<span class="type">int</span> length)</span>&#123;</span><br><span class="line">        values = <span class="keyword">new</span> <span class="title class_">Object</span>[length];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">push</span><span class="params">(Object ele)</span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(size&gt;=values.length)&#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">RuntimeException</span>(<span class="string">&quot;栈空间已满&quot;</span>)</span><br><span class="line">        &#125;</span><br><span class="line">        values[size]=ele;</span><br><span class="line">        size++;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> Object <span class="title function_">pop</span><span class="params">()</span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(size &lt;=<span class="number">0</span>)&#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">RuntimeException</span>(<span class="string">&quot;栈空间已空&quot;</span>)</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="type">Object</span> <span class="variable">obj</span> <span class="operator">=</span> values[size-<span class="number">1</span>];</span><br><span class="line">        values[size-<span class="number">1</span>] = <span class="literal">null</span>;</span><br><span class="line">        size--;</span><br><span class="line">        <span class="keyword">return</span> obj;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="队列FIFO"><a href="#队列FIFO" class="headerlink" title="队列FIFO"></a>队列FIFO</h2><ul>
+<li>属于抽象数据类型（ADT）</li>
+<li>可以使用数组或链表来构建</li>
+</ul>
+<p>class Stack{<br>    &#x2F;&#x2F;数组实现栈<br>    Object[] values<br>    int size;</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Queue</span>&#123;</span><br><span class="line">    Object[] values;</span><br><span class="line">    <span class="type">int</span> size;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">Queue</span><span class="params">(<span class="type">int</span> lenght)</span>&#123;</span><br><span class="line">        values = <span class="keyword">new</span> <span class="title class_">Object</span>[length];</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">add</span><span class="params">(Object ele)</span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(size&gt;= values.length)&#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">RuntimeException</span>(<span class="string">&quot;队列已满，添加失败&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        values[size] = ele;</span><br><span class="line">        size ++;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> Object <span class="title function_">get</span><span class="params">()</span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(size&lt;=<span class="number">0</span>)&#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">RuntimeException</span>(<span class="string">&quot;队列已空，获取失败&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="type">Object</span> <span class="variable">obj</span> <span class="operator">=</span> values[<span class="number">0</span>];</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> i= <span class="number">0</span>;i&lt;size-<span class="number">1</span>;i++)&#123;</span><br><span class="line">            values[i] = values[i+<span class="number">1</span>];</span><br><span class="line">        &#125;</span><br><span class="line">        values[size - <span class="number">1</span>] = <span class="literal">null</span>;</span><br><span class="line">        size --;</span><br><span class="line">        <span class="keyword">return</span> obj;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="List源码"><a href="#List源码" class="headerlink" title="List源码"></a>List源码</h1><h2 id="ArrayList"><a href="#ArrayList" class="headerlink" title="ArrayList"></a>ArrayList</h2><p><strong>ArrayList特点</strong></p>
+<ul>
+<li>实现了List接口，存储有序、可以重复的数据</li>
+<li>底层使用Object[]数组存储</li>
+<li>线程不安全</li>
+</ul>
+<p><strong>ArrayList源码解析</strong></p>
+<p><strong>jdk7</strong>: 如下代码执行：底层会初始化数组，数组的长度为10。Object[] elementData &#x3D; new Object[10]</p>
+<p>ArrayList<String> list &#x3D; new ArrayList&lt;&gt;()</p>
+<p>list.add(“AA”);&#x2F;&#x2F;elementData[0] &#x3D; “AA”;</p>
+<p>list.add(“BB”); &#x2F;&#x2F;elementData[1] &#x3D; “BB”;</p>
+<p>…..</p>
+<p>当添加第11个元素时，底层elementData数组已满，则需要扩容。默认扩容为原来长度的1.5倍。并将原有数组中的元素赋值到新的数组中</p>
+<p>**jdk8:**底层会初始化数组，即：Object[] elementData&#x3D; new Object[]{};</p>
+<p>ArrayList<String> list &#x3D; new ArrayList&lt;&gt;();</p>
+<p>list.add(“AA”);&#x2F;&#x2F;首次添加元素，会初始化数组 elementData &#x3D; new Object[10]; elementData[0] &#x3D; “AA”;</p>
+<p>list.add(“BB”);&#x2F;&#x2F;elementData[1] &#x3D; “BB”;</p>
+<p>当添加第11个元素时，底层elementData数组已满，则需要扩容。默认扩容为原来长度的1.5倍。并将原有数组中的元素赋值到新的数组中</p>
+<h2 id=""><a href="#" class="headerlink" title=""></a></h2><p><strong>小结</strong></p>
+<p>jdk7中类似于饿汉式</p>
+<p>jdk8中类似于懒汉式</p>
+<h2 id="Vector"><a href="#Vector" class="headerlink" title="Vector"></a>Vector</h2><p><strong>特点</strong></p>
+<ul>
+<li>实现了List接口，存储有序、可以重复的数据</li>
+<li>底层使用了Object[]数组存储</li>
+<li>线程安全</li>
+</ul>
+<p><strong>源码</strong></p>
+<p>Vector v &#x3D; new Vector();&#x2F;&#x2F;底层初始化数组，长度为10 Object[] element &#x3D; new Object[10];</p>
+<p>v.add(“aa”);</p>
+<p>v.add(“bb”);</p>
+<p>当前添加第11个元素时，扩容2倍</p>
+<h2 id="LinkedList"><a href="#LinkedList" class="headerlink" title="LinkedList"></a>LinkedList</h2><p><strong>特点</strong></p>
+<ul>
+<li>实现List接口，存储有序、可以重复的数据</li>
+<li>底层使用了双向链表存储</li>
+<li>线程不安全</li>
+</ul>
+<p><strong>源码</strong></p>
+<p>LinkedList<String> list &#x3D; new LinkedList&lt;&gt;(); &#x2F;&#x2F;底层也没做啥</p>
+<p>list.add(“AA”);&#x2F;&#x2F;将“AA”封装到一个Node对象中，list对象的属性first、last都指向次node对象。</p>
+<p>list.add(“BB”);&#x2F;&#x2F;将“BB”封装到一个Node对象2中，对象1和对象2构成一个双向链表，同时last指向此Node对象2  </p>
+<p>…..</p>
+<p>因为linkedList使用的是双向链表，不需要考虑扩容问题。</p>
+<h2 id="启示"><a href="#启示" class="headerlink" title="启示"></a>启示</h2><p>1.Vector不使用了</p>
+<p>2.ArrayList底层使用数组结构，查找和添加（尾部添加）操作效率高，时间复杂度为O（1）</p>
+<p>删除和插入操作效率低，时间复杂度为O（n)</p>
+<p>LinkedList底层使用双向链表，删除和插入操作效率高，时间复杂度O（1）</p>
+<p>查找和添加（尾部添加）操作效率低，时间为O（n)（添加可能O(1))</p>
+<p>3.在选择了ArrayList的前提下，new ArrayList()：底层创建长度为10的数组。</p>
+<p>new ArrayList(int capacity):底层创建指定capacity长度的数组。</p>
+<h1 id="Map源码"><a href="#Map源码" class="headerlink" title="Map源码"></a>Map源码</h1><h2 id="HashMap源码解析"><a href="#HashMap源码解析" class="headerlink" title="HashMap源码解析"></a>HashMap源码解析</h2><p><strong>jdk7:</strong></p>
+<p>&#x2F;&#x2F;创建对象的过程中，底层会初始化数组Entry[] table &#x3D; new Entry[16];</p>
+<p>HashMap&lt;String, Integer&gt; map &#x3D; new HashMap&lt;&gt;();</p>
+<p>map.put(“AA”, 78); &#x2F;&#x2F;“AA”和78封装到一个Entry对象总，考虑将此对象添加到table数组中。</p>
+<p>…</p>
+<p>添加&#x2F;修改的过程:</p>
+<p>将（key1,value1)添加到当前的map中</p>
+<p>首先，需要调用key所在类的hashCode()方法，计算key1对应的哈希值1，此哈希值1经过某种算法（hash())之后，得到哈希值2。</p>
+<p>哈希值2再经过某种算法（indexFor())之后，就确定了(key1,value1)在数组table中的索引位置i。</p>
+<ul>
+<li>如果此索引位置i的数组上没有元素，则（key1,value1)添加成功  —&gt;情况1</li>
+<li>如果此缩影位置i的数组上有元素（key2,value2),则需要继续比较key1和key2的哈希值2  —&gt;哈希冲突<ul>
+<li>如果key1的哈希值2与key2的哈希值2不相同，则(key1,value1)添加成功。  —-&gt;情况2</li>
+<li>如果key1的哈希值2与key2的哈哈希值2相同，则需要继续比较key1和key2的equals()。要调用key1所在类的equals(),将key2作为参数传递进去<ul>
+<li>调用equals()，返回false:则（key1,value1)添加成功  —-&gt;情况3</li>
+<li>调用equals(),返回true:则认为key1和key2是相同的。默认情况下，value1替换原有的value2.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p><strong>说明</strong>：</p>
+<ul>
+<li>情况1：将（key1, value1)存放到数组的索引i的位置</li>
+<li>情况2，情况3：（key1,value1)元素与现有的（key2, value2)构成单向链表结构，（key1,value1)指向（key2,value2)</li>
+</ul>
+<p>随着不断的添加元素，在满足如下的条件的情况下，会考虑扩容：</p>
+<p>（size&gt;&#x3D; threshold) &amp;&amp;(null !&#x3D;table[i])</p>
+<p>当元素的个数达到临界值（-&gt;数组的长度* 加载因子）时，就考虑扩容。 默认的临界值 &#x3D; 16*0.75 –》12.</p>
+<p>默认扩容为原来的两倍</p>
+<p><strong>jdk8与jdk7的不同之处</strong></p>
+<ol>
+<li>在jdk8中，当我面创建了HashMap实例以后，底层并没有初始化table数组。当首次添加(key,value)时，进行判断，如果发现table尚未初始化，则对数组进行初始化。</li>
+<li>在jdk8中，HashMap底层定义类Node内部类，替换了jdk7中的Entry内部类。意味着，我们创建的数组是Node[]</li>
+<li>jdk8中，当前的(key,value)经过一系列判断之后，可以添加到当前的数组的角标i中。如果此时角标i位置上有元素。在jdk7中是将新的（key,value)指向已有的旧的元素（头插法）。而在jdk8中旧的元素指向新的（key,value)元素（尾插法）</li>
+<li>jdk7：数组+单向链表；jdk8:数组+单向链表+红黑树。</li>
+</ol>
+<p>​		什么时候会使用红黑树：如果数组索引i位置上的元素的个数达到8，并且数组的长度达到64时，我们就将此索引i位置上的多个元素改为使用红黑树的结构进行存储。 （为什么修改呢？红黑树进行put()&#x2F;get()&#x2F;remove()，操作的时间复杂度为O（logn),比单向链表的时间复杂度O(n)的好。性能高。</p>
+<p>​		什么时候会使用红黑树变为单向链表：当使用红黑树的索引i位置上的元素的个数小于6时，就会将红黑树退化为单向链表。</p>
+<h2 id="LinkedHashMap"><a href="#LinkedHashMap" class="headerlink" title="LinkedHashMap"></a>LinkedHashMap</h2><p>LinkedHashMap是HashMap的子类</p>
+<p>使用的数组+单向链表+红黑树的基础上，又增加了一对双向链表，记录添加的（key,value)的先后顺序。便于我们遍历所有的key-value。</p>
+<p>重写了增加方法。</p>
+<h2 id="HashSet和LinkedHashSet源码分析"><a href="#HashSet和LinkedHashSet源码分析" class="headerlink" title="HashSet和LinkedHashSet源码分析"></a>HashSet和LinkedHashSet源码分析</h2><ul>
+<li>HashSet底层使用HashMap</li>
+<li>LinkedHashSet使用的是LinkedHashMap</li>
+</ul>
+<h1 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a>常见问题</h1><h2 id="链表和数组的区别？"><a href="#链表和数组的区别？" class="headerlink" title="链表和数组的区别？"></a>链表和数组的区别？</h2><h2 id="栈是如何运行的？"><a href="#栈是如何运行的？" class="headerlink" title="栈是如何运行的？"></a>栈是如何运行的？</h2><h2 id="ArraList的默认大小是多少，以及扩容机制"><a href="#ArraList的默认大小是多少，以及扩容机制" class="headerlink" title="ArraList的默认大小是多少，以及扩容机制"></a>ArraList的默认大小是多少，以及扩容机制</h2><h2 id="ArraList的底层是怎么实现的"><a href="#ArraList的底层是怎么实现的" class="headerlink" title="ArraList的底层是怎么实现的"></a>ArraList的底层是怎么实现的</h2><h2 id="数组和ArrayList的区别"><a href="#数组和ArrayList的区别" class="headerlink" title="数组和ArrayList的区别"></a>数组和ArrayList的区别</h2><p>ArrayList看作是对数组的常见操作的封装</p>
+<h2 id="什么是线程安全的List"><a href="#什么是线程安全的List" class="headerlink" title="什么是线程安全的List"></a>什么是线程安全的List</h2><h2 id="HashMap初始值16，临界值12是怎么算的"><a href="#HashMap初始值16，临界值12是怎么算的" class="headerlink" title="HashMap初始值16，临界值12是怎么算的"></a>HashMap初始值16，临界值12是怎么算的</h2><h2 id="HashMap长度为什么是2的幂"><a href="#HashMap长度为什么是2的幂" class="headerlink" title="HashMap长度为什么是2的幂"></a>HashMap长度为什么是2的幂</h2><p>为了方便计算要添加的元素的底层的索引i</p>
+<h2 id="HashMap怎么计算哈是在和索引？扩容机制？解决Hash冲突"><a href="#HashMap怎么计算哈是在和索引？扩容机制？解决Hash冲突" class="headerlink" title="HashMap怎么计算哈是在和索引？扩容机制？解决Hash冲突"></a>HashMap怎么计算哈是在和索引？扩容机制？解决Hash冲突</h2><h2 id="HashMap底层为什么加链表？"><a href="#HashMap底层为什么加链表？" class="headerlink" title="HashMap底层为什么加链表？"></a>HashMap底层为什么加链表？</h2><p>因为有哈斯冲突。解决方案，使用链表的方式。保证要添加的元素仍然在索引i的位置上</p>
+<h2 id="HashMap为什么长度达到一定的长度要转化为红黑树？"><a href="#HashMap为什么长度达到一定的长度要转化为红黑树？" class="headerlink" title="HashMap为什么长度达到一定的长度要转化为红黑树？"></a>HashMap为什么长度达到一定的长度要转化为红黑树？</h2><h2 id="HashMap的get-原理？"><a href="#HashMap的get-原理？" class="headerlink" title="HashMap的get()原理？"></a>HashMap的get()原理？</h2><h2 id="hashCode-与equals-生产算法，方法怎么重写？"><a href="#hashCode-与equals-生产算法，方法怎么重写？" class="headerlink" title="hashCode()与equals()生产算法，方法怎么重写？"></a>hashCode()与equals()生产算法，方法怎么重写？</h2><p>进行equals()判断使用的属性，通常也都会参与到hashCode()的计算中。尽量保证hashCode()的一致性。</p>
+<h2 id="equals与-的区别，equals相等hash值一定相等吗？hash值相等equals一定相等吗？"><a href="#equals与-的区别，equals相等hash值一定相等吗？hash值相等equals一定相等吗？" class="headerlink" title="equals与&#x3D;&#x3D;的区别，equals相等hash值一定相等吗？hash值相等equals一定相等吗？"></a>equals与&#x3D;&#x3D;的区别，equals相等hash值一定相等吗？hash值相等equals一定相等吗？</h2>
+      
+    </div>
+
+    
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://aluggnb.com/2023/10/09/javaday11_generics/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="Alugg">
+      <meta itemprop="description" content="Step out of your comfort zone">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Alugg's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/10/09/javaday11_generics/" class="post-title-link" itemprop="url">java-Day11——泛型</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-10-09 22:18:01" itemprop="dateCreated datePublished" datetime="2023-10-09T22:18:01+08:00">2023-10-09</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>2.6k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="泛型的引入"><a href="#泛型的引入" class="headerlink" title="泛型的引入"></a>泛型的引入</h1><p>所谓泛型，就是允许在定义类、接口时通过一个<strong>标识</strong>来表示类中<strong>某个属性的类型</strong>或者是某个方法的<strong>返回值或参数的类型</strong>。这个类型参数将在使用时（例如，继承或实现这个接口、创建对象或调用方法时）确定（即传入实际的类型参数，也称为类型实参）</p>
+<h2 id=""><a href="#" class="headerlink" title=""></a></h2><p><strong>在集合使用泛型前可能存在的问题</strong></p>
+<p>问题1：类型不安全。因为add()的参数是Object类型，意味着任何类型的对象都可以添加成功</p>
+<p>问题2：需要使用强转操作，繁琐。还有可能导致ClassCastException异常</p>
+<h1 id="泛型的使用"><a href="#泛型的使用" class="headerlink" title="泛型的使用"></a>泛型的使用</h1><p><strong>使用说明</strong></p>
+<ul>
+<li>集合框架在生命接口和实现类时使用泛型，在实例化集合对象时，如果没有使用泛型，则认为操作的是Object类型的数据。如果使用了泛型，则需要指明泛型的具体类型。一旦指明了泛型的具体类型，则阿紫集合的相关的方法中，凡是使用泛型的位置，都替换为具体的泛型类型。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">GenericTest</span> &#123;</span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">test</span><span class="params">()</span>&#123;</span><br><span class="line">        List&lt;Integer&gt; list = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;Integer&gt;();</span><br><span class="line">        list.add(<span class="number">78</span>);</span><br><span class="line">        list.add(<span class="number">254</span>);</span><br><span class="line">        list.add(<span class="number">54</span>);</span><br><span class="line">        list.add(<span class="number">99</span>);</span><br><span class="line">        <span class="comment">//编译报错，保证类型安全</span></span><br><span class="line">        <span class="comment">// list.add(&quot;AA&quot;);</span></span><br><span class="line">        Iterator&lt;Integer&gt; iterator = list.iterator();</span><br><span class="line">        <span class="keyword">while</span>(iterator.hasNext())&#123;</span><br><span class="line">            <span class="comment">//因为添加的都是Integer类型，避免了强转操作</span></span><br><span class="line">            <span class="type">Integer</span> <span class="variable">i</span> <span class="operator">=</span> iterator.next();</span><br><span class="line">            <span class="type">int</span> <span class="variable">score</span> <span class="operator">=</span> i;</span><br><span class="line">            System.out.println(score);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//在map中的使用</span></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">test2</span><span class="params">()</span>&#123;</span><br><span class="line">        HashMap&lt;String, Integer&gt; map = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();<span class="comment">//类型推断</span></span><br><span class="line">        map.put(<span class="string">&quot;Tom&quot;</span>, <span class="number">12</span>);</span><br><span class="line">        map.put(<span class="string">&quot;jack&quot;</span>,<span class="number">23</span>);</span><br><span class="line">        map.put(<span class="string">&quot;hh&quot;</span>, <span class="number">24</span>);</span><br><span class="line"></span><br><span class="line">        Set&lt;Map.Entry&lt;String, Integer&gt;&gt; entreSet = map.entrySet();</span><br><span class="line">        Iterator&lt;Map.Entry&lt;String, Integer&gt;&gt; iterator = entreSet.iterator();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> (iterator.hasNext())&#123;</span><br><span class="line">            Map.Entry&lt;String, Integer&gt; entry = iterator.next();</span><br><span class="line">            <span class="type">String</span> <span class="variable">key</span> <span class="operator">=</span> entry.getKey();</span><br><span class="line">            <span class="type">Integer</span> <span class="variable">value</span> <span class="operator">=</span> entry.getValue();</span><br><span class="line">            System.out.println(key+<span class="string">&quot;--&gt;&quot;</span>+value);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="自定义泛型"><a href="#自定义泛型" class="headerlink" title="自定义泛型"></a>自定义泛型</h1><h2 id="自定义泛型类-接口"><a href="#自定义泛型类-接口" class="headerlink" title="自定义泛型类\接口"></a>自定义泛型类\接口</h2><p><strong>格式</strong></p>
+<p>class A<T>{</p>
+<p>}</p>
+<p>interface B&lt;T1,T2&gt;{</p>
+<p>}</p>
+<p><strong>使用说明：</strong></p>
+<ol>
+<li>声明完自定义泛型类以后，可以在类的内部（比如属性、方法、构造器中）使用类的泛型</li>
+<li>创建自定义泛型类的对象时，可以指明泛型参数类型。一旦指明，内部凡是所使用类的泛型参数的位置，都具体化为指定的类的泛型类型。</li>
+<li>创建自定义泛型类的对象时，没有指明泛型参数类型，那么泛型将被擦除，泛型对应的类型均安装Object处理，但不等于Object。经验：泛型要用使用一路都用，要不用，一路都不用。</li>
+<li>泛型的指定中必须使用引用数据类型。不能使用基本数据类型，此时只能使用包装类替换。</li>
+<li>除创建泛型类对象外，子类继承泛型类时、实现类实现泛型接口时，也可以确定泛型结构中的泛型参数。</li>
+</ol>
+<p>如果我们在给泛型类提供子类时，子类也不确定泛型的类型，则可以继续使用泛型参数。</p>
+<p>我们还可以再现有的父类的泛型参数的基础上，新增泛型参数</p>
+<p><strong>注意：</strong></p>
+<ol>
+<li><p>泛型类可能有多个参数，此时应将多个参数一起放在尖括号内。比如&lt;E1,E2,E3&gt;</p>
+</li>
+<li><p>JDK7开始，泛型的简化操作：ArrayList<Fruit> flist &#x3D; new ArrayList&lt;&gt;();</p>
+</li>
+<li><p>如果泛型结构是一个接口或抽象类，则不可以创建泛型类的对象</p>
+</li>
+<li><p>不能使用new E()。但是可以，E[] elements &#x3D; (E[])new Object[capacity];</p>
+</li>
+<li><p>在类&#x2F;接口上声明的泛型，在本类或本接口中即代表某种类型，但不可以在静态方法中使用类的泛型。</p>
+</li>
+<li><p>异常类不可以带泛型。</p>
+</li>
+</ol>
+<h2 id="自定义泛型方法"><a href="#自定义泛型方法" class="headerlink" title="自定义泛型方法"></a>自定义泛型方法</h2><p><strong>格式</strong>：</p>
+<p>权限修饰符 <T> 返回值类型 方法名（形参列表）{</p>
+<p>}</p>
+<p><strong>举例</strong></p>
+<p>public <E> E method(E e){</p>
+<p>}</p>
+<p><strong>说明</strong></p>
+<ul>
+<li>声明泛型方法时，一定要添加泛型参数<T></li>
+<li>泛型参数在方法调用时，指明其具体的类型</li>
+<li>泛型方法可以根据需要声明为static</li>
+<li>泛型方法所属的类是否是一个泛型类，都可以。</li>
+</ul>
+<h1 id="泛型在继承上的体现"><a href="#泛型在继承上的体现" class="headerlink" title="泛型在继承上的体现"></a>泛型在继承上的体现</h1><p>1.类SuperA是类A的父类，则G<superA>与G<A>的关系？</p>
+<p>二者是并列的两个类，没有任何子父类的关系</p>
+<p>2.类SuperA是类A的父类或接口，superA<G>与A<G>的关系？</p>
+<p>superA<G>与A<G>有继承或实现的关系。即A<G>的实例可以赋值给SuperA<G>类型的引用或变量。</p>
+<h1 id="通配符"><a href="#通配符" class="headerlink" title="通配符"></a>通配符</h1><h2 id="使用说明"><a href="#使用说明" class="headerlink" title="使用说明"></a>使用说明</h2><p>ArrayList&lt;?&gt;</p>
+<p>G<?> 可以看作是G<A>类型的父类，即可以将G<A>的对象赋值给G<?>类型的引用或变量</p>
+<h2 id="读写特点"><a href="#读写特点" class="headerlink" title="读写特点"></a>读写特点</h2><ul>
+<li>读取数据：允许的，读取的值为Object类型</li>
+<li>写入数据：不允许。特例,null</li>
+</ul>
+<h2 id="有限制条件的通配符"><a href="#有限制条件的通配符" class="headerlink" title="有限制条件的通配符"></a>有限制条件的通配符</h2><p>List&lt;? extends A&gt;:可以将List<A>或List<B>赋值给List&lt;? extends A&gt;其中B类是A类的子类</p>
+<p>List&lt;? super A&gt;：可以将List<A>或List<B>赋值给List&lt;? super A&gt;其中B类是A类的父类</p>
+<h1 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a>常见问题</h1><h2 id="Java的泛型是什么？有什么好处和优点？JDK不同版本的泛型有什么区别？"><a href="#Java的泛型是什么？有什么好处和优点？JDK不同版本的泛型有什么区别？" class="headerlink" title="Java的泛型是什么？有什么好处和优点？JDK不同版本的泛型有什么区别？"></a>Java的泛型是什么？有什么好处和优点？JDK不同版本的泛型有什么区别？</h2><p>泛型，是程序中出现的不确定的类型。</p>
+<p>以集合来举例：把一个集合中的内容限制为一个特定的数据类型，这就是generic背后的核心思想。</p>
+
+      
+    </div>
+
+    
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://aluggnb.com/2023/10/08/javaday10_collection_map/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2021,347 +2410,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://aluggnb.com/2023/09/29/os_memoryP2/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.png">
-      <meta itemprop="name" content="Alugg">
-      <meta itemprop="description" content="Step out of your comfort zone">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Alugg's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/09/29/os_memoryP2/" class="post-title-link" itemprop="url">内存管理_part2</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2023-09-29 11:21:37 / 修改时间：17:22:24" itemprop="dateCreated datePublished" datetime="2023-09-29T11:21:37+08:00">2023-09-29</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" itemprop="url" rel="index"><span itemprop="name">操作系统</span></a>
-                </span>
-            </span>
-
-          <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>1.5k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="请求分页管理方式"><a href="#请求分页管理方式" class="headerlink" title="请求分页管理方式"></a>请求分页管理方式</h1><h2 id="虚拟内存"><a href="#虚拟内存" class="headerlink" title="虚拟内存"></a>虚拟内存</h2><p><strong>定义</strong>:具有请求调入和置换功能，从逻辑上对内存容量加以扩充的一种存储器系统</p>
-<p><strong>虚拟内存的实现</strong></p>
-<ul>
-<li>请求分页存储管理</li>
-<li>请求分段存储管理</li>
-<li>请求段页式存储管理</li>
-</ul>
-<h2 id="页表机制"><a href="#页表机制" class="headerlink" title="页表机制"></a>页表机制</h2><ul>
-<li>状态位P</li>
-<li>访问字段A</li>
-<li>修改位M</li>
-<li>外存地址</li>
-</ul>
-<h2 id="缺页中断机构"><a href="#缺页中断机构" class="headerlink" title="缺页中断机构"></a>缺页中断机构</h2><h2 id="内中断（CPU内部）"><a href="#内中断（CPU内部）" class="headerlink" title="内中断（CPU内部）"></a>内中断（CPU内部）</h2><ul>
-<li><p>故障中断：错误条件引起可以被修复，如缺页中断</p>
-</li>
-<li><p>陷入中断：有意为之，应用程序想调用内核功能。如系统调用</p>
-</li>
-<li><p>终止中断：致命错误</p>
-</li>
-</ul>
-<h2 id="外中断（CPU外部）"><a href="#外中断（CPU外部）" class="headerlink" title="外中断（CPU外部）"></a>外中断（CPU外部）</h2><ul>
-<li>I&#x2F;O中断请求</li>
-<li>人工干预</li>
-</ul>
-<h2 id="地址变换机构"><a href="#地址变换机构" class="headerlink" title="地址变换机构"></a>地址变换机构</h2><ul>
-<li>请求调页，判断是否在内存</li>
-<li>可能需要页面置换</li>
-<li>新增、修改页表项</li>
-<li>热点表项同步到快表</li>
-</ul>
-<h2 id=""><a href="#" class="headerlink" title=""></a></h2><h2 id="页面置换算法"><a href="#页面置换算法" class="headerlink" title="页面置换算法"></a>页面置换算法</h2><h3 id="最佳置换算法OPT"><a href="#最佳置换算法OPT" class="headerlink" title="最佳置换算法OPT"></a>最佳置换算法OPT</h3><p><strong>保障对低缺页率</strong>：每次选择淘汰最不可能再次被使用的页面 （无法实现）</p>
-<h3 id="最近最少页面置换算法LRU"><a href="#最近最少页面置换算法LRU" class="headerlink" title="最近最少页面置换算法LRU"></a>最近最少页面置换算法LRU</h3><p><strong>保障时间和距离上的公平</strong>：每次选择淘汰最久最近未使用的页面 （需要硬件支持，开销大）</p>
-<h3 id="先进先出置换算法FIFO"><a href="#先进先出置换算法FIFO" class="headerlink" title="先进先出置换算法FIFO"></a>先进先出置换算法FIFO</h3><p><strong>保障顺序上的公平</strong>：每次选择淘汰最早进入内存的页面（Belady异常，性能差）</p>
-<h3 id="-1"><a href="#-1" class="headerlink" title=""></a></h3><h3 id="时钟置换算法："><a href="#时钟置换算法：" class="headerlink" title="时钟置换算法："></a><strong>时钟置换算法</strong>：</h3><p><strong>保障性能和开销均衡</strong>：为页面设置访问位（0&#x2F;1)，并链接形成循环队列，进程访问页面后置为1。发生缺页中断时，表针就扫描页面，位置为0就淘汰，位置为1就设置为0并向把表针向前移动一个位置。</p>
-<h3 id="最近未使用页面置换算法NRU："><a href="#最近未使用页面置换算法NRU：" class="headerlink" title="最近未使用页面置换算法NRU："></a>最近未使用页面置换算法NRU：</h3><p><strong>额外考虑是否修改，保障最少I&#x2F;O操作</strong>：设置访问位和修改位，访问位为优先原则。第一轮找（0,0） 第二轮找（0,1）并修改访问位为0，第三轮找（0,0），第四轮找（0,1）</p>
-<h2 id="页面分配策略"><a href="#页面分配策略" class="headerlink" title="页面分配策略"></a>页面分配策略</h2><h3 id="驻留集（驻留在主存中页面数）大小"><a href="#驻留集（驻留在主存中页面数）大小" class="headerlink" title="驻留集（驻留在主存中页面数）大小"></a>驻留集（驻留在主存中页面数）大小</h3><ul>
-<li><p>分配空间小，进程数量多，CPU时间利用效率就高</p>
-</li>
-<li><p>进程在主存中页数少，错页率就高</p>
-</li>
-<li><p>进程在主存中页数多，错页率并无明显改善</p>
-</li>
-<li><p>全局页面置换算法：全局页面置换算法则是不考虑进程的个体情况，而是综合考虑整个系统内所有页面的情况。</p>
-</li>
-<li><p>局部页面置换算法：局部页面置换算法是基于进程本身的页面访问模式的算法</p>
-</li>
-</ul>
-<p>固定分配局部置换：这种策略指定了每个进程在内存中占用固定数量的页面帧。当进程被加载到内存时，它会被分配一定数量的页面帧，并且在其执行期间，这些页面帧不会被其他进程使用。如果进程需要更多的内存空间，它必须等待其他进程释放内存，或者操作系统必须将某个进程的页面替换出去来为其腾出空间。这种策略可以简化内存管理，但可能导致内存浪费或资源不足的问题。</p>
-<p>可变分配全局置换：这种策略允许进程的内存分配在运行时动态变化，而不是固定分配一定数量的页面帧。当进程需要更多内存时，操作系统可以为其分配更多页面帧，反之亦然。全局页面置换意味着页面替换决策基于整个系统的页面使用情况，不仅仅限于某个进程。这种策略可以更好地利用内存资源，但需要更复杂的管理算法来进行页面替换决策，以最大程度地提高系统性能。</p>
-<p>可变分配局部置换：这种策略结合了前两种策略的特点。进程可以在运行时动态分配或释放内存，但页面替换决策仍然是基于进程本身的页面访问模式。这意味着每个进程可以根据需要调整内存分配，但页面替换决策仍然以进程为单位进行，以优化局部性。这种策略在某些情况下可以平衡内存使用效率和性能。</p>
-<h2 id="调入页面的时机"><a href="#调入页面的时机" class="headerlink" title="调入页面的时机"></a>调入页面的时机</h2><h3 id="预调页策略"><a href="#预调页策略" class="headerlink" title="预调页策略"></a>预调页策略</h3><ul>
-<li>一次性调入若干相邻页面</li>
-<li>多用于进程首次调入</li>
-</ul>
-<h3 id="请求调页"><a href="#请求调页" class="headerlink" title="请求调页"></a>请求调页</h3><ul>
-<li>运行时发现缺页时调入</li>
-<li>I&#x2F;O开销较大</li>
-</ul>
-<h2 id="从何处调页"><a href="#从何处调页" class="headerlink" title="从何处调页"></a>从何处调页</h2><p>外存分对换区和文件区，对换区可以保证地址是连续的，因此访问更快</p>
-<h3 id="系统拥有足够对换空间："><a href="#系统拥有足够对换空间：" class="headerlink" title="系统拥有足够对换空间："></a>系统拥有足够对换空间：</h3><p>核心的放内存，辅助的放对换区</p>
-<h3 id="系统缺少足够对换空间："><a href="#系统缺少足够对换空间：" class="headerlink" title="系统缺少足够对换空间："></a>系统缺少足够对换空间：</h3><p>不需要修改的一些文件比如函数计算公式不含数据，放入文件区。从内存调出时，不需要重新写入，直接覆盖就行，减少I&#x2F;O操作。</p>
-<p>优先把经常需要修改的文件放对换区，调出时的回写效率更高。</p>
-<h3 id="UNIX方式："><a href="#UNIX方式：" class="headerlink" title="UNIX方式："></a>UNIX方式：</h3><p>所有跟进程有关的文件，都放入文件区。 要换出都放入对换区</p>
-
-      
-    </div>
-
-    
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://aluggnb.com/2023/09/28/javaday2_oob2/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.png">
-      <meta itemprop="name" content="Alugg">
-      <meta itemprop="description" content="Step out of your comfort zone">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Alugg's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/09/28/javaday2_oob2/" class="post-title-link" itemprop="url">java-Day2——封装</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2023-09-28 23:10:25" itemprop="dateCreated datePublished" datetime="2023-09-28T23:10:25+08:00">2023-09-28</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
-                </span>
-            </span>
-
-          <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>1.4k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="1-封装性"><a href="#1-封装性" class="headerlink" title="1.封装性"></a>1.封装性</h1><p>1.1 <strong>四种权限修饰符</strong>：private、缺省、protected、public</p>
-<p>​	类：只能用public、缺省修饰</p>
-<p>​	类的内部成员：四种都可以</p>
-<p>1.2 <strong>作用</strong>：用四种权限修饰来修饰类和类的内部成员。当这些成员被调用时，体现可见性的大小</p>
-<table>
-<thead>
-<tr>
-<th>修饰符</th>
-<th>本类内部</th>
-<th>本包内</th>
-<th>其他包的子类</th>
-<th>其他包的非子类</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>private</td>
-<td>√</td>
-<td>×</td>
-<td>×</td>
-<td>×</td>
-</tr>
-<tr>
-<td>缺省</td>
-<td>√</td>
-<td>√</td>
-<td>×</td>
-<td>×</td>
-</tr>
-<tr>
-<td>protected</td>
-<td>√</td>
-<td>√</td>
-<td>√</td>
-<td>×</td>
-</tr>
-<tr>
-<td>public</td>
-<td>√</td>
-<td>√</td>
-<td>√</td>
-<td>√</td>
-</tr>
-</tbody></table>
-<p>1.3 <strong>使用频率</strong></p>
-<p>比较高：public、private</p>
-<p>低：缺省、protected</p>
-<p>1.4 <strong>封装性体现</strong></p>
-<p>场景1：private类的属性，提供public的get和set方法，对此属性进行获取或修改</p>
-<p>场景2：将类中不需要对外暴露的方法，设置为private</p>
-<p>场景3：单例模式中构造器private的，避免在类的外部创建实例。</p>
-<h1 id="2-构造器"><a href="#2-构造器" class="headerlink" title="2.构造器"></a>2.构造器</h1><p>2.1 构造器的作用</p>
-<p>作用1：搭配new关键字，创建类的对象</p>
-<p>作用2：在创建对象的同时，可以给对象的相关属性赋值</p>
-<p>2.2 构造器使用说明</p>
-<ul>
-<li><p>构造器声明的格式：权限修饰符 类名（形参）{}</p>
-</li>
-<li><p>创建类后，在没有显示提高任何构造器的情况下，系统默认提供一个空参的构造器，且构造器权限与类声明的权限相同</p>
-</li>
-<li><p>一旦类中显示声明了构造器，则系统不再提供默认的空参构造器</p>
-</li>
-<li><p>一个类中可以声明多个构造器，彼此之间构成重载</p>
-</li>
-</ul>
-<h1 id="3-类中属性赋值过程"><a href="#3-类中属性赋值过程" class="headerlink" title="3.类中属性赋值过程"></a>3.类中属性赋值过程</h1><p>3.1类中属性赋值的渠道</p>
-<ol>
-<li>默认初始化</li>
-<li>显示初始化</li>
-<li>构造器初始化</li>
-<li>通过“对象.方法”的方式赋值；</li>
-<li>通过“对象.属性”的方式赋值；</li>
-</ol>
-<h1 id="4-JavaBean"><a href="#4-JavaBean" class="headerlink" title="4.JavaBean"></a>4.JavaBean</h1><p>JavaBean：一种java语言写成的可重用组件</p>
-<p>JavaBean符合如下标准的Java类：</p>
-<ul>
-<li>类是公共的</li>
-<li>有一个无参的公共的构造器</li>
-<li>有属性，且有对应的get、set方法</li>
-</ul>
-<h1 id="5-This-关键字"><a href="#5-This-关键字" class="headerlink" title="5.This 关键字"></a>5.This 关键字</h1><p>5.1 this可以调用的结构： 成员变量、方法、构造器</p>
-<p>5.2 this的理解：当前对象（在方法中调用时）或当前正在创建的对象（在构造器中调用时）</p>
-<p>5.3 this调用属性和方法</p>
-<p>针对于方法内的使用情况（非static）：</p>
-<p>一般情况：通过对象a调用方法，<strong>可以在方法内调用当前对象a的属性或其他方法</strong>。此时，可以在属性和其他方法前使用“this.”，表示当前属性或方法所属的对象a。 但是通常，我们都选择省略”this.”结构</p>
-<p>特殊情况： 如果方法的形参与对象的属性同名了，必须使用this进行区分。</p>
-<p>5.4 this调用构造器</p>
-<p>格式：this(形参)。</p>
-<h1 id="6-常见问题"><a href="#6-常见问题" class="headerlink" title="6.常见问题"></a>6.常见问题</h1><p>6.1 java中内存结构的划分</p>
-<ul>
-<li>java中内存结果划分为： 虚拟机栈、堆、方法区；程序计数器、本地方法栈</li>
-<li>虚拟机栈：以栈帧为基本单位，有入栈和出栈操作；每个栈帧入栈操作对应一个方法的执行；方法内的局部变量会存储在栈帧中。</li>
-<li>堆空间：new出来的结构（数组、对象）： 1.数组，数组的元素在堆中 2.对象的成员变量在堆中</li>
-<li>方法区：加载的类的模版结构</li>
-</ul>
-<p>6.2 Java引用类型有几种？</p>
-<p>类、数组、接口；枚举、注解、记录</p>
-<p>6.3 对象存在java内存的哪种区域里：</p>
-<p>堆空间</p>
-<p>6.4 main方法public能不能换成private？</p>
-<p>能。但是改以后就不能作为程序的入口了，就只是一个普通的方法</p>
-<p>6.5 构造方法和普通方法的区别</p>
-<p>编写角度：没有共同点。 声明格式、作用都不同</p>
-<p>字节码角度：构造器会以<init>（）方法的形态呈现，用以初始化对象。</p>
-<p>6.6 成员变量和局部变量的区别：</p>
-<ul>
-<li>声明的位置</li>
-<li>内存中存放的位置</li>
-<li>作用域</li>
-<li>权限修饰符</li>
-<li>初始化值</li>
-<li>生命周期</li>
-</ul>
-<p>6.7 变量赋值和构造方法加载的优先级问题</p>
-<p>通过字节码文件可以发现变量显示赋值先于构造器中的赋值</p>
-
-      
-    </div>
-
-    
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -2433,14 +2481,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">42</span>
+          <span class="site-state-item-count">44</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-count">4</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
   </nav>
@@ -2481,12 +2529,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">190k</span>
+    <span title="站点总字数">200k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">2:53</span>
+    <span title="站点阅读时长">3:02</span>
 </div>
 
 

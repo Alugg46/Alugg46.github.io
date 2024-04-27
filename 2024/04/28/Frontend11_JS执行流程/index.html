@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-loading-bar.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"aluggnb.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="JS执行流程   详细过程全局代码的执行 1.解析代码:栈中:先会创建一个执行上下文Excution context(EC). 在EC中,有一个Variable Object,与堆中:Global Object(GO)相绑定. Global Object中就是window对象,里面放着一些Math,Date,Number.和var变量,代码中所写的var变量,函数等等都是GO的属性,在解析阶段这些">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Frontend-Day11——JSIntro">
+<meta property="og:url" content="https://aluggnb.com/2024/04/28/Frontend11_JS%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B/index.html">
+<meta property="og:site_name" content="Alugg&#39;s Blog">
+<meta property="og:description" content="JS执行流程   详细过程全局代码的执行 1.解析代码:栈中:先会创建一个执行上下文Excution context(EC). 在EC中,有一个Variable Object,与堆中:Global Object(GO)相绑定. Global Object中就是window对象,里面放着一些Math,Date,Number.和var变量,代码中所写的var变量,函数等等都是GO的属性,在解析阶段这些">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i0.imgs.ovh/2023/11/01/AeMjI.png">
+<meta property="og:image" content="https://i0.imgs.ovh/2023/11/01/AenZ2.png">
+<meta property="og:image" content="https://i0.imgs.ovh/2023/11/01/AeHxj.png">
+<meta property="article:published_time" content="2024-04-28T15:44:01.000Z">
+<meta property="article:modified_time" content="2024-04-28T15:44:01.000Z">
+<meta property="article:author" content="Alugg">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i0.imgs.ovh/2023/11/01/AeMjI.png">
+
+<link rel="canonical" href="https://aluggnb.com/2024/04/28/Frontend11_JS%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Frontend-Day11——JSIntro | Alugg's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Alugg's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://aluggnb.com/2024/04/28/Frontend11_JS%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="Alugg">
+      <meta itemprop="description" content="Step out of your comfort zone">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Alugg's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Frontend-Day11——JSIntro
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2024-04-28 23:44:01" itemprop="dateCreated datePublished" datetime="2024-04-28T23:44:01+08:00">2024-04-28</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Frontend/" itemprop="url" rel="index"><span itemprop="name">Frontend</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.1k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="JS执行流程"><a href="#JS执行流程" class="headerlink" title="JS执行流程"></a>JS执行流程</h1><p><img src="https://i0.imgs.ovh/2023/11/01/AeMjI.png" alt="AeMjI.png"></p>
+<p><img src="https://i0.imgs.ovh/2023/11/01/AenZ2.png" alt="AenZ2.png"></p>
+<p><img src="https://i0.imgs.ovh/2023/11/01/AeHxj.png" alt="AeHxj.png"></p>
+<h1 id="详细过程"><a href="#详细过程" class="headerlink" title="详细过程"></a>详细过程</h1><p>全局代码的执行</p>
+<h2 id="1-解析代码"><a href="#1-解析代码" class="headerlink" title="1.解析代码:"></a>1.解析代码:</h2><p>栈中:先会创建一个执行上下文Excution context(EC). 在EC中,有一个Variable Object,与堆中:Global Object(GO)相绑定.</p>
+<p>Global Object中就是window对象,里面放着一些Math,Date,Number.和var变量,代码中所写的var变量,函数等等都是GO的属性,在解析阶段这些值都是undefinied.如果有函数,会立刻创建一个函数的对象Function Object,并且Function Object中包含基本的属性length name.GO中这个函数属性就指向这个Function Object. 如果这个函数是多层嵌套,只会有最外层的函数不会继续向内解析内层函数.</p>
+<h2 id="2-执行时"><a href="#2-执行时" class="headerlink" title="2.执行时"></a>2.执行时</h2><p>var变量会被依次赋值. 执行到函数时,栈中会创建一个新的EC,堆中会创建一个(Activation object)AO对象, 并且这个EC的VO会与这个AO对象相绑定,会使用arguments作为初始化.</p>
+<p>作用域链只跟函数声明的位置有关,和执行的位置无关.</p>
+<h1 id="内存管理"><a href="#内存管理" class="headerlink" title="内存管理"></a>内存管理</h1><h2 id="垃圾回收Garbage-Collection-GC"><a href="#垃圾回收Garbage-Collection-GC" class="headerlink" title="垃圾回收Garbage Collection (GC)"></a>垃圾回收Garbage Collection (GC)</h2><p><strong>Reference Counting 引用计数</strong></p>
+<ul>
+<li><p>当一个对象有一个引用指向它时,那么这个对象的引用retainCount就+1</p>
+</li>
+<li><p>对象的引用为0时,这个对象就可以被销毁掉</p>
+</li>
+</ul>
+<p>弊端可能会产生循环引用</p>
+<p><strong>mark-Sweep 标记清除</strong></p>
+<ul>
+<li><p>核心思路是可达性Reachability</p>
+</li>
+<li><p>设置一个根对象root object,垃圾回收期会定期从这个根开始,找所有从根开始有引用到的对象,对于哪些没有引用到的对象,就认为是不可用的对象</p>
+</li>
+<li><p>这个算法可以很好的解决循环引用的问题</p>
+</li>
+</ul>
+<p><strong>Mark-Compact</strong> </p>
+<p>回收期间会将保留的存储对象搬运到连续的内存空间,从而整合空闲空间,避免内存碎片化</p>
+<p><strong>Generational collection</strong> </p>
+<p>对象会分为两组,新的和旧的</p>
+<ul>
+<li><p>许多对象的出现,完成它们的工作并很快死去,它们可以很快被清理</p>
+</li>
+<li><p>那些长期存活的对象会变得老旧,而且被检查的频次也会减少</p>
+</li>
+</ul>
+<p><strong>Incremental collection</strong></p>
+<ul>
+<li><p>如果有许多对象,并且我们试图依次遍历并标记整个对象集,则可能需要一些时间,并在执行过程中带来明显的延长.</p>
+</li>
+<li><p>所以引擎试图将辣椒手机工作分层几部分来做然后将这几部分会逐一进行处理,这样会有许多微小的延迟而不是一个大的延迟</p>
+</li>
+</ul>
+<p><strong>Idle-time collection</strong>闲时收集</p>
+<p>垃圾收集器只会在CPU空闲时尝试运行,以减少可能对代码执行的影响 </p>
+<h1 id="闭包Closure"><a href="#闭包Closure" class="headerlink" title="闭包Closure"></a>闭包Closure</h1><p>闭包实现上是一个结构体,它存储了一个函数和一个关联的环境.</p>
+<p>广义上,JS中的函数都是闭包</p>
+<p>狭义上,JS中一个函数,如果访问了外层作用域的变量,那么它是一个闭包</p>
+
+    </div>
+
+    
+    
+    
+    
+      <div>
+      <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:24px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+      </div>
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Alugg
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://aluggnb.com/2024/04/28/Frontend11_JS%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B/" title="Frontend-Day11——JSIntro">https://aluggnb.com/2024/04/28/Frontend11_JS执行流程/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+    
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/04/28/Frontend12_JS%E5%87%BD%E6%95%B0%E5%AF%B9%E8%B1%A1/" rel="prev" title="Frontend-Day12——JSFunction">
+      <i class="fa fa-chevron-left"></i> Frontend-Day12——JSFunction
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/04/28/Frontend10_%E6%B5%8F%E8%A7%88%E5%99%A8%E6%B8%B2%E6%9F%93%E5%8E%9F%E7%90%86/" rel="next" title="Frontend-Day10——浏览器渲染">
+      Frontend-Day10——浏览器渲染 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#JS%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B"><span class="nav-number">1.</span> <span class="nav-text">JS执行流程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%AF%A6%E7%BB%86%E8%BF%87%E7%A8%8B"><span class="nav-number">2.</span> <span class="nav-text">详细过程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E8%A7%A3%E6%9E%90%E4%BB%A3%E7%A0%81"><span class="nav-number">2.1.</span> <span class="nav-text">1.解析代码:</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E6%89%A7%E8%A1%8C%E6%97%B6"><span class="nav-number">2.2.</span> <span class="nav-text">2.执行时</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86"><span class="nav-number">3.</span> <span class="nav-text">内存管理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6Garbage-Collection-GC"><span class="nav-number">3.1.</span> <span class="nav-text">垃圾回收Garbage Collection (GC)</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%97%AD%E5%8C%85Closure"><span class="nav-number">4.</span> <span class="nav-text">闭包Closure</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Alugg"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">Alugg</p>
+  <div class="site-description" itemprop="description">Step out of your comfort zone</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">44</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:lu.tian2022@gmail.com" title="E-Mail → mailto:lu.tian2022@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2023-09 – 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Alugg</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">200k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">3:02</span>
+</div>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
