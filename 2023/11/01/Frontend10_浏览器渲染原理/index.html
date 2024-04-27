@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-loading-bar.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"aluggnb.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="浏览器渲染原理 回流reflow 第一次确定节点的大小和位置,称之为布局layout 之后对节点的大小,位置修改重新计算称之为回流  如何引起回流  DOM结构发生改变(添加新的节点或者移除节点) 改变了布局(修改了width,height,padding,font-size等值) 窗口resize(修改窗口的尺寸) 调用getComputedStyle方法获取尺寸,位置信息  回流一定会引起重绘">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Alugg&#39;s Blog">
+<meta property="og:url" content="https://aluggnb.com/2023/11/01/Frontend10_%E6%B5%8F%E8%A7%88%E5%99%A8%E6%B8%B2%E6%9F%93%E5%8E%9F%E7%90%86/index.html">
+<meta property="og:site_name" content="Alugg&#39;s Blog">
+<meta property="og:description" content="浏览器渲染原理 回流reflow 第一次确定节点的大小和位置,称之为布局layout 之后对节点的大小,位置修改重新计算称之为回流  如何引起回流  DOM结构发生改变(添加新的节点或者移除节点) 改变了布局(修改了width,height,padding,font-size等值) 窗口resize(修改窗口的尺寸) 调用getComputedStyle方法获取尺寸,位置信息  回流一定会引起重绘">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i0.imgs.ovh/2023/11/01/AerNu.png">
+<meta property="article:published_time" content="2023-11-01T13:53:32.000Z">
+<meta property="article:modified_time" content="2024-04-27T22:39:55.853Z">
+<meta property="article:author" content="Alugg">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i0.imgs.ovh/2023/11/01/AerNu.png">
+
+<link rel="canonical" href="https://aluggnb.com/2023/11/01/Frontend10_%E6%B5%8F%E8%A7%88%E5%99%A8%E6%B8%B2%E6%9F%93%E5%8E%9F%E7%90%86/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title> | Alugg's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Alugg's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://aluggnb.com/2023/11/01/Frontend10_%E6%B5%8F%E8%A7%88%E5%99%A8%E6%B8%B2%E6%9F%93%E5%8E%9F%E7%90%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="Alugg">
+      <meta itemprop="description" content="Step out of your comfort zone">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Alugg's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-11-01 21:53:32" itemprop="dateCreated datePublished" datetime="2023-11-01T21:53:32+08:00">2023-11-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-04-28 06:39:55" itemprop="dateModified" datetime="2024-04-28T06:39:55+08:00">2024-04-28</time>
+              </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.5k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="浏览器渲染原理"><a href="#浏览器渲染原理" class="headerlink" title="浏览器渲染原理"></a>浏览器渲染原理</h1><p><a target="_blank" rel="noopener" href="https://imgloc.com/image/AerNu"><img src="https://i0.imgs.ovh/2023/11/01/AerNu.png" alt="AerNu.png"></a></p>
+<h2 id="回流reflow"><a href="#回流reflow" class="headerlink" title="回流reflow"></a>回流reflow</h2><ul>
+<li>第一次确定节点的大小和位置,称之为布局layout</li>
+<li>之后对节点的大小,位置修改重新计算称之为回流</li>
+</ul>
+<p>如何引起回流</p>
+<ul>
+<li>DOM结构发生改变(添加新的节点或者移除节点)</li>
+<li>改变了布局(修改了width,height,padding,font-size等值)</li>
+<li>窗口resize(修改窗口的尺寸)</li>
+<li>调用getComputedStyle方法获取尺寸,位置信息</li>
+</ul>
+<p>回流一定会引起重绘,所以回流是非常消耗性能的事情</p>
+<h2 id="重绘repaint"><a href="#重绘repaint" class="headerlink" title="重绘repaint"></a>重绘repaint</h2><ul>
+<li>第一次渲染内容称之为绘制(paint)</li>
+<li>之后重新渲染称之为重绘</li>
+</ul>
+<p>如何引起重绘</p>
+<ul>
+<li>背景色,文字颜色,边框颜色,样式</li>
+</ul>
+<p>在开发中尽量避免发生回流</p>
+<ul>
+<li><p>修改样式时尽量一次性修改</p>
+<ul>
+<li>通过cssText,比如通过添加class修改</li>
+</ul>
+</li>
+<li><p>尽量避免频繁的操作DOM</p>
+<ul>
+<li>可以在一个DocumentFragment或者父元素中将要操作的DOM操作完成,再一次性的操作</li>
+</ul>
+</li>
+<li><p>尽量避免通过getComputedStyle获取尺寸,位置信息</p>
+</li>
+<li><p>对某些元素使用position的absolute或fixed</p>
+<ul>
+<li>并不是不会引起回流,而是开销相对较小,不会对其他元素造成影响</li>
+</ul>
+</li>
+</ul>
+<h2 id="合成composite"><a href="#合成composite" class="headerlink" title="合成composite"></a>合成composite</h2><p>多个图层好处,一个图层进行了修改并不会影响其他图层导致其他图层需要重新渲染</p>
+<ul>
+<li>绘制的过程,可以将布局后的元素绘制到多个合成图层中<ul>
+<li>浏览器的一种优化手段</li>
+</ul>
+</li>
+<li>默认情况下,标准流的内容都是被绘制在同一个图层Layer中</li>
+<li>一些特殊的属性,会创建一个新的合成层,并且新的图层可以利用GPU来加速绘制<ul>
+<li>因为每个合成层都是单独渲染的</li>
+</ul>
+</li>
+</ul>
+<p>常见的形成新的合成层的一些属性</p>
+<ul>
+<li>3D transforms</li>
+<li>video, canavas, iframe</li>
+<li>opacity动画转换</li>
+<li>position:fixed</li>
+<li>will-change:提前告诉浏览器元素可能发生哪些变化</li>
+<li>animation或transition设置了opacity,transform</li>
+</ul>
+<p>分层确实可以提高性能,但是以内存管理为代价,因此不应作为web性能优化策略的一部分过度使用.</p>
+<h2 id="script元素和页面解析的关系"><a href="#script元素和页面解析的关系" class="headerlink" title="script元素和页面解析的关系"></a>script元素和页面解析的关系</h2><ul>
+<li>浏览器在解析HTML的过程总遇到了script元素是不能继续构建DOM树</li>
+<li>它会停止继续构建,首先下载js代码,并且执行js的脚本</li>
+<li>只有等到js脚本执行结束后,才会继续解析HTML,构建DOM树</li>
+</ul>
+<p>这么做的原因,因为JS涉及大量DOM操作,如果等到DOM树构建完成并且渲染好了再执行JS会造成严重的回流和重绘,影响页面性能.</p>
+<p>但这也会带来新问题,现代网页开发中,脚步往往比HTML页面更重,处理时间需要更长;所有会造成页面的解析阻塞,在脚步下载执行完成之前,用户在界面上什么都看不到</p>
+<p>为解决这个问题script提供了两个属性<strong>defer,async</strong></p>
+<p>(需要注意,为了达到更好的用户体验,呈现引擎会力求尽快将内容显示在屏幕上,它不必等到整个HTML文档解析完毕之后,就会开始构建呈现树和设置布局)</p>
+<h2 id="defer"><a href="#defer" class="headerlink" title="defer"></a>defer</h2><p><strong>defer</strong>属性告诉浏览器不要等待JS下载,而继续解析HTML,构建DOM Tree</p>
+<ul>
+<li>脚本会由浏览器来进行下载,但是不会阻塞DOM Tree的构建过程</li>
+<li>脚本提前下载好了,它会等待DOM Tree构建完成,在DOMContentLoaded事件之前先执行defer中的代码</li>
+</ul>
+<p>DOMContentLoaded总是会等待defer中的代码先执行完成</p>
+<p>推荐将defer的脚本放入head中.</p>
+<h2 id="async"><a href="#async" class="headerlink" title="async"></a>async</h2><p>async是让一个脚本完全独立的:</p>
+<ul>
+<li>浏览器不会因async脚步而阻塞</li>
+<li>async脚步不能保证顺序,它是独立下载,独立运行,不会等待其他脚本</li>
+<li>async不会能保证在DOMContentLoaded之前或之后执行</li>
+</ul>
+<p>defer通常用于需要再文档解析后操作DOM的js代码,并且对多个script文件有顺序要求</p>
+
+    </div>
+
+    
+    
+    
+    
+      <div>
+      <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:24px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+      </div>
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Alugg
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://aluggnb.com/2023/11/01/Frontend10_%E6%B5%8F%E8%A7%88%E5%99%A8%E6%B8%B2%E6%9F%93%E5%8E%9F%E7%90%86/" title="">https://aluggnb.com/2023/11/01/Frontend10_浏览器渲染原理/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+    
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/10/31/Frontend08_%E4%BB%A3%E7%A0%81%E8%A7%84%E8%8C%83/" rel="prev" title="">
+      <i class="fa fa-chevron-left"></i> 
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/11/02/Frontend11_JS%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B/" rel="next" title="">
+       <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B5%8F%E8%A7%88%E5%99%A8%E6%B8%B2%E6%9F%93%E5%8E%9F%E7%90%86"><span class="nav-number">1.</span> <span class="nav-text">浏览器渲染原理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9E%E6%B5%81reflow"><span class="nav-number">1.1.</span> <span class="nav-text">回流reflow</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%87%8D%E7%BB%98repaint"><span class="nav-number">1.2.</span> <span class="nav-text">重绘repaint</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%88%E6%88%90composite"><span class="nav-number">1.3.</span> <span class="nav-text">合成composite</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#script%E5%85%83%E7%B4%A0%E5%92%8C%E9%A1%B5%E9%9D%A2%E8%A7%A3%E6%9E%90%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="nav-number">1.4.</span> <span class="nav-text">script元素和页面解析的关系</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#defer"><span class="nav-number">1.5.</span> <span class="nav-text">defer</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#async"><span class="nav-number">1.6.</span> <span class="nav-text">async</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Alugg"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">Alugg</p>
+  <div class="site-description" itemprop="description">Step out of your comfort zone</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">43</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:lu.tian2022@gmail.com" title="E-Mail → mailto:lu.tian2022@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2023-09 – 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Alugg</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">190k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">2:53</span>
+</div>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

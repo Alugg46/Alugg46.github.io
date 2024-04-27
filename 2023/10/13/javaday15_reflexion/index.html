@@ -298,13 +298,12 @@
 </ol>
 <p>1.3 JavaBean中要给一个当前类提供一个公共的空参构造器的意义</p>
 <p>场景1：子类对象在实例化时，子类的构造器的首行默认调用父类空参的构造器。</p>
-<p>场景2：在反射中，经常用来创建运行时类的对象。那么我要求各个运行时类都提供一个空参的构造器，便于我们编写</p>
-<p>创建运行时类对象的代码</p>
+<p>场景2：在反射中，经常用来创建运行时类的对象。那么我要求各个运行时类都提供一个空参的构造器，便于我们编写创建运行时类对象的代码</p>
 <p>1.4在jdk9中标识为过时，替换成什么结构</p>
 <p>通过Constructor类调用newInstance(…)</p>
 <h2 id="2-获取运行时类的内部结构"><a href="#2-获取运行时类的内部结构" class="headerlink" title="2.获取运行时类的内部结构"></a>2.获取运行时类的内部结构</h2><p>2.1获取运行时类的内部结果1：所有属性、所有方法、所有构造器</p>
 <p>2.2获取运行时类的内部结果2：父类、接口、包、带泛型的父类、父类的泛型</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">test2</span><span class="params">()</span> <span class="keyword">throws</span> ClassNotFoundException &#123;</span><br><span class="line">    <span class="type">Class</span> <span class="variable">clazz</span> <span class="operator">=</span> Class.forName(<span class="string">&quot;com.alugg.reflection.Person&quot;</span>);</span><br><span class="line">    <span class="comment">//运行时类的父类</span></span><br><span class="line">    <span class="type">Type</span> <span class="variable">superclass</span> <span class="operator">=</span> clazz.getGenericSuperclass();</span><br><span class="line"></span><br><span class="line">    <span class="comment">//运行时类的接口</span></span><br><span class="line">    Class[] interfaces = clazz.getInterfaces();</span><br><span class="line">    <span class="keyword">for</span>(Class c:interfaces)&#123;</span><br><span class="line">        System.out.println(c);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//运行时类的包</span></span><br><span class="line">    <span class="type">Package</span> <span class="variable">pack</span> <span class="operator">=</span> clazz.getPackage();</span><br><span class="line">    <span class="comment">//运行时类的父类的泛型</span></span><br><span class="line">    <span class="type">Type</span> <span class="variable">superclass1</span> <span class="operator">=</span> clazz.getGenericSuperclass();</span><br><span class="line">    <span class="comment">//如果父类是带泛型的，则可以墙砖为Parameterized</span></span><br><span class="line">    <span class="type">ParameterizedType</span> <span class="variable">paramType</span> <span class="operator">=</span> (ParameterizedType) superclass1;</span><br><span class="line">    <span class="comment">//调用getActualTypeArguments()获取带泛型的参数，结果是一个数组，因为可能有多个泛型参数</span></span><br><span class="line">    Type[] arguments = paramType.getActualTypeArguments();</span><br><span class="line">    System.out.println(((Class)arguments[<span class="number">0</span>]).getName());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">test2</span><span class="params">()</span> <span class="keyword">throws</span> ClassNotFoundException &#123;</span><br><span class="line">    <span class="type">Class</span> <span class="variable">clazz</span> <span class="operator">=</span> Class.forName(<span class="string">&quot;com.alugg.reflection.Person&quot;</span>);</span><br><span class="line">    <span class="comment">//运行时类的父类</span></span><br><span class="line">    <span class="type">Type</span> <span class="variable">superclass</span> <span class="operator">=</span> clazz.getSuperclass();</span><br><span class="line"></span><br><span class="line">    <span class="comment">//运行时类的接口</span></span><br><span class="line">    Class[] interfaces = clazz.getInterfaces();</span><br><span class="line">    <span class="keyword">for</span>(Class c:interfaces)&#123;</span><br><span class="line">        System.out.println(c);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//运行时类的包</span></span><br><span class="line">    <span class="type">Package</span> <span class="variable">pack</span> <span class="operator">=</span> clazz.getPackage();</span><br><span class="line">    <span class="comment">//运行时类的父类的泛型</span></span><br><span class="line">    <span class="type">Type</span> <span class="variable">superclass1</span> <span class="operator">=</span> clazz.getGenericSuperclass();</span><br><span class="line">    <span class="comment">//如果父类是带泛型的，则可以强转为Parameterized</span></span><br><span class="line">    <span class="type">ParameterizedType</span> <span class="variable">paramType</span> <span class="operator">=</span> (ParameterizedType) superclass1;</span><br><span class="line">    <span class="comment">//调用getActualTypeArguments()获取带泛型的参数，结果是一个数组，因为可能有多个泛型参数</span></span><br><span class="line">    Type[] arguments = paramType.getActualTypeArguments();</span><br><span class="line">    System.out.println(((Class)arguments[<span class="number">0</span>]).getName());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <h2 id=""><a href="#" class="headerlink" title=""></a></h2><h2 id="3-调用指定的结构：指定的属性、方法、构造器"><a href="#3-调用指定的结构：指定的属性、方法、构造器" class="headerlink" title="3.调用指定的结构：指定的属性、方法、构造器"></a>3.调用指定的结构：指定的属性、方法、构造器</h2><p>3.1<strong>调用指定属性:</strong></p>
 <p>实例属性</p>
@@ -460,7 +459,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">20</span>
+          <span class="site-state-item-count">43</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -499,7 +498,7 @@
 <div class="copyright">
   
   &copy; 2023-09 – 
-  <span itemprop="copyrightYear">2023</span>
+  <span itemprop="copyrightYear">2024</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
@@ -508,12 +507,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">111k</span>
+    <span title="站点总字数">190k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">1:40</span>
+    <span title="站点阅读时长">2:53</span>
 </div>
 
 

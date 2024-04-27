@@ -268,7 +268,7 @@
 <li>方法的返回值可以不一样</li>
 <li>无参构造和有参构造，也是一种重载</li>
 </ul>
-<h2 id="Super关键字"><a href="#Super关键字" class="headerlink" title="Super关键字"></a>Super关键字</h2><p>只能用于继承，并在子类中使用。代表父类对象<br>Case1: 子类继承父类后，对父类方法进行重写，在子类中对父类的方法进行调用<br>Case2: 子类继承父类后，发型子类和父类中定义类了同名的属性，在子类中区分同名属性</p>
+<h2 id="Super关键字"><a href="#Super关键字" class="headerlink" title="Super关键字"></a>Super关键字</h2><p>只能用于继承，并在子类中使用。代表父类对象<br>Case1: 子类继承父类后，对父类方法进行重写，在子类中对父类的方法进行调用<br>Case2: 子类继承父类后，发现子类和父类中定义类了同名的属性，在子类中区分同名属性</p>
 <p>this:</p>
 <ul>
 <li>​	代表当前类对象</li>
@@ -285,14 +285,14 @@
 <h2 id="子类对象实例化全过程"><a href="#子类对象实例化全过程" class="headerlink" title="子类对象实例化全过程"></a>子类对象实例化全过程</h2><p>1.从结构角度来看：体现为类的继承性</p>
 <p>当我们创建子类对象后，子类对象就获取了其父类中声明所有的属性和方法，在权限允许的情况下，可以直接调用</p>
 <p>2.从过程角度来看：</p>
-<p>当我们通过子类的构造器创建对象时，子类的构造器一定会直接或间接调用其父类的构造器，而其父类的构造器同样会直接或间接的调用其父类的父类构造器…知道调用了Object类中的构造器为止</p>
+<p>当我们通过子类的构造器创建对象时，子类的构造器一定会直接或间接调用其父类的构造器，而其父类的构造器同样会直接或间接的调用其父类的父类构造器…直到调用了Object类中的构造器为止</p>
 <p>正因为我们调用过子类所有父类的构造器，所有我们就会将父类中声明的属性、方法加载到内存中，供子类对象使用</p>
 <h2 id="抽象"><a href="#抽象" class="headerlink" title="抽象"></a>抽象</h2><p>在面向对象中，所有的对象可以通过类来创建。并不是所有类可以通过创建对象。如果一个类中没有足够完整的信息来描述具体的对象的话，那么这个类叫抽象类</p>
 <p>abstract修饰<strong>类</strong>：</p>
 <ul>
 <li>此类成为抽象类</li>
 <li>抽象类不能实例化</li>
-<li>抽象类中是包含构造器的，因为子类实例化时会直接或间接调用到父类的构造器</li>
+<li>抽象类中<strong>是包含构造器的</strong>，因为子类实例化时会直接或间接调用到父类的构造器</li>
 <li>抽象类可以没有抽象方法。</li>
 </ul>
 <p>abstract修饰<strong>方法</strong>：</p>
@@ -301,7 +301,7 @@
 <li>抽象方法只有方法声明，没有方法体。</li>
 <li>子类必须要重写父类的所有抽象方法后才能实例化</li>
 </ul>
-<p>abstract不能能修饰：属性、构造器、代码块等</p>
+<p>abstract不能修饰：属性、构造器、代码块等</p>
 <p>abstract不能修饰：私有方法、静态方法、final方法、final类</p>
 <ul>
 <li>私有方法不能重写</li>
@@ -316,8 +316,8 @@
 <p>3.多态性的应用：</p>
 <p>多态性的应用：虚拟方法的调用</p>
 <p>在多态场景下，调用方法时：</p>
-<p>​	编译时，认为方法时左边声明的父类的类型的方法</p>
-<p>​	执行时，实际执行的是<strong>子类重写</strong>父类的方法</p>
+<p>​	编译时，认为方法是左边声明的父类的类型的方法</p>
+<p>​	执行时，实际执行的是右边<strong>子类重写</strong>父类的方法</p>
 <p>简称：编译看左边，运行看右边</p>
 <p>多态是运行时的行为。</p>
 <p>4.多态使用前提：</p>
@@ -326,7 +326,7 @@
 <li>要有方法的重写</li>
 </ul>
 <p>5.多态的实用性</p>
-<p>开发中：</p>
+<p><strong>开发中：</strong></p>
 <p>使用父类做方法的形参，是多态使用最多的场合。即使增加了新的子类，方法也无需改变，提高了扩展性，符合开闭原则。</p>
 <p><strong>开闭原则</strong></p>
 <ol>
@@ -334,7 +334,7 @@
 <li>简单来说，软件系统的各种组件，如模块、类、功能等，应该在不修改现有代码基础上，引入新功能。</li>
 </ol>
 <p>ex:</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Account</span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">withdraw</span><span class="params">()</span>&#123;&#125; <span class="comment">//取钱</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">CheckAccount</span> <span class="keyword">extends</span> <span class="title class_">AccountP</span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">withdraw</span><span class="params">()</span>&#123;&#125; <span class="comment">//取钱</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">SavingAccount</span> <span class="keyword">extends</span> <span class="title class_">AccountP</span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">withdraw</span><span class="params">()</span>&#123;&#125; <span class="comment">//取钱</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Customer</span>&#123;</span><br><span class="line">    Account account;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setAccount</span><span class="params">(Account account)</span>&#123;</span><br><span class="line">        <span class="built_in">this</span>.account = account;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> Account <span class="title function_">getAccount</span><span class="params">()</span>&#123;</span><br><span class="line">        <span class="keyword">return</span> account;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Test</span>&#123;</span><br><span class="line">    main()&#123;</span><br><span class="line">        <span class="type">Customer</span> <span class="variable">cust</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Customer</span>();</span><br><span class="line">        cust.setAccount(<span class="keyword">new</span> <span class="title class_">CheckAccount</span>()); <span class="comment">//直接使用子类</span></span><br><span class="line">        cust.withdraw(); <span class="comment">//使用的也是子类重写的方法</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Account</span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">withdraw</span><span class="params">()</span>&#123;&#125; <span class="comment">//取钱</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">CheckAccount</span> <span class="keyword">extends</span> <span class="title class_">Account</span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">withdraw</span><span class="params">()</span>&#123;&#125; <span class="comment">//取钱</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">SavingAccount</span> <span class="keyword">extends</span> <span class="title class_">Account</span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">withdraw</span><span class="params">()</span>&#123;&#125; <span class="comment">//取钱</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Customer</span>&#123;</span><br><span class="line">    Account account;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setAccount</span><span class="params">(Account account)</span>&#123;</span><br><span class="line">        <span class="built_in">this</span>.account = account;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> Account <span class="title function_">getAccount</span><span class="params">()</span>&#123;</span><br><span class="line">        <span class="keyword">return</span> account;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Test</span>&#123;</span><br><span class="line">    main()&#123;</span><br><span class="line">        <span class="type">Customer</span> <span class="variable">cust</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Customer</span>();</span><br><span class="line">        cust.setAccount(<span class="keyword">new</span> <span class="title class_">CheckAccount</span>()); <span class="comment">//直接使用子类</span></span><br><span class="line">        cust.withdraw(); <span class="comment">//使用的也是子类重写的方法</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 
 
@@ -363,7 +363,7 @@
 </li>
 </ul>
 <p>3.开发中使用说明：</p>
-<p>实际开发中，针对于自定义的类，常常会判断两个对象是否equals(),而此时主要是判断两个对象的属性值是否相等。所有我们需要重写object类的equals()方法</p>
+<p>实际开发中，针对于自定义的类，常常会判断两个对象是否equals(),而此时主要是判断两个对象的<strong>属性值</strong>是否相等。所有我们需要重写object类的equals()方法</p>
 <p>重写方法：</p>
 <ul>
 <li><p>自己重写</p>
@@ -517,7 +517,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">20</span>
+          <span class="site-state-item-count">43</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -556,7 +556,7 @@
 <div class="copyright">
   
   &copy; 2023-09 – 
-  <span itemprop="copyrightYear">2023</span>
+  <span itemprop="copyrightYear">2024</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
@@ -565,12 +565,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">111k</span>
+    <span title="站点总字数">190k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">1:40</span>
+    <span title="站点阅读时长">2:53</span>
 </div>
 
 
