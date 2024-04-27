@@ -155,7 +155,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://aluggnb.com/2024/04/27/hello-world/">
+    <link itemprop="mainEntityOfPage" href="https://aluggnb.com/2024/04/28/Frontend01_htmlIntro/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.png">
@@ -169,7 +169,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2024/04/27/hello-world/" class="post-title-link" itemprop="url">Hello World</a>
+            <a href="/2024/04/28/Frontend01_htmlIntro/" class="post-title-link" itemprop="url">Frontend-Day1——html</a>
         </h2>
 
         <div class="post-meta">
@@ -179,7 +179,16 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2024-04-28 05:02:02" itemprop="dateCreated datePublished" datetime="2024-04-28T05:02:02+08:00">2024-04-28</time>
+              <time title="创建时间：2024-04-28 23:44:01" itemprop="dateCreated datePublished" datetime="2024-04-28T23:44:01+08:00">2024-04-28</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Frontend/" itemprop="url" rel="index"><span itemprop="name">Frontend</span></a>
+                </span>
             </span>
 
           <br>
@@ -188,7 +197,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>367</span>
+              <span>615</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -207,19 +216,54 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>Welcome to <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a target="_blank" rel="noopener" href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a target="_blank" rel="noopener" href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a target="_blank" rel="noopener" href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
+          <h1 id="iframe元素"><a href="#iframe元素" class="headerlink" title="iframe元素"></a>iframe元素</h1><ul>
+<li>嵌套网页</li>
+<li>许多网页禁止嵌套(网页中返回体中有iframe禁止)</li>
+</ul>
+<h1 id="div和span"><a href="#div和span" class="headerlink" title="div和span"></a>div和span</h1><p>**div:**多个div元素包裹的内容会在不同的行显示;</p>
+<ul>
+<li>一般作为其他元素的父容器,把其他元素包住,代表一个整体</li>
+<li>用于把网页分割为多个独立的部分</li>
+</ul>
+<p>**span:**多个span元素包裹的内容会在同一行显示</p>
+<ul>
+<li>默认情况下,跟普通文本机会没差别</li>
+<li>用于区分特殊文本和普通文本,比如用来显示一些关键字</li>
+</ul>
+<h1 id="不常用元素"><a href="#不常用元素" class="headerlink" title="不常用元素"></a>不常用元素</h1><ul>
+<li><strong></strong>:强调</li>
+<li><i></i>:斜体</li>
+<li><code></code>:代码</li>
+</ul>
+<h1 id="常见全局属性"><a href="#常见全局属性" class="headerlink" title="常见全局属性"></a>常见全局属性</h1><ul>
+<li>id</li>
+<li>class</li>
+<li>style</li>
+<li>title</li>
+</ul>
+<h1 id="字符实体character-entity"><a href="#字符实体character-entity" class="headerlink" title="字符实体character entity"></a>字符实体character entity</h1><p>html文档中插入特殊符号</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">span</span>&gt;</span><span class="symbol">&amp;nbsp;</span><span class="tag">&lt;/<span class="name">span</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">span</span>&gt;</span><span class="symbol">&amp;lt;</span><span class="tag">&lt;/<span class="name">span</span>&gt;</span></span><br></pre></td></tr></table></figure>
 
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+<p><a target="_blank" rel="noopener" href="https://imgloc.com/image/2Refd"><img src="https://i.imgs.ovh/2023/10/21/2Refd.png" alt="2Refd.png"></a></p>
+<h1 id="URL和URI"><a href="#URL和URI" class="headerlink" title="URL和URI"></a>URL和URI</h1><p>URI:Identifier相当于身份证号</p>
+<p>URL:Locator相当于住址</p>
+<p>URL是URI的子集</p>
+<h1 id="元素语义化Element-semantics"><a href="#元素语义化Element-semantics" class="headerlink" title="元素语义化Element semantics"></a>元素语义化Element semantics</h1><p>defin:用正确的元素做正确的事情.</p>
+<p>因为理论上所有的html元素都能实现相同的事情</p>
+<h1 id="Link"><a href="#Link" class="headerlink" title="Link"></a>Link</h1><ul>
+<li>href: 被链接资源的URL.</li>
+<li>rel:指定链接类型,如icon, stylesheet</li>
+</ul>
+<h1 id="浏览器渲染流程"><a href="#浏览器渲染流程" class="headerlink" title="浏览器渲染流程"></a>浏览器渲染流程</h1><ol>
+<li>Load HTML</li>
+<li>Parse HTML(遇到css 不会停止,先把整体结构解析出来)<ol>
+<li>load CSS(与Parse html并行)</li>
+<li>parse CSS</li>
+</ol>
+</li>
+<li>Create Dom tree(整体结构解析出来后,添加css样式 成为render tree)</li>
+<li>Display</li>
+</ol>
 
       
     </div>
@@ -1731,14 +1775,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">43</span>
+          <span class="site-state-item-count">42</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-count">3</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
   </nav>

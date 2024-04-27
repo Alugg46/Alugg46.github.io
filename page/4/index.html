@@ -155,154 +155,6 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://aluggnb.com/2023/10/09/javaday11_generics/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.png">
-      <meta itemprop="name" content="Alugg">
-      <meta itemprop="description" content="Step out of your comfort zone">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Alugg's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/10/09/javaday11_generics/" class="post-title-link" itemprop="url">java-Day11——泛型</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2023-10-09 22:18:01" itemprop="dateCreated datePublished" datetime="2023-10-09T22:18:01+08:00">2023-10-09</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
-                </span>
-            </span>
-
-          <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>2.6k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="泛型的引入"><a href="#泛型的引入" class="headerlink" title="泛型的引入"></a>泛型的引入</h1><p>所谓泛型，就是允许在定义类、接口时通过一个<strong>标识</strong>来表示类中<strong>某个属性的类型</strong>或者是某个方法的<strong>返回值或参数的类型</strong>。这个类型参数将在使用时（例如，继承或实现这个接口、创建对象或调用方法时）确定（即传入实际的类型参数，也称为类型实参）</p>
-<h2 id=""><a href="#" class="headerlink" title=""></a></h2><p><strong>在集合使用泛型前可能存在的问题</strong></p>
-<p>问题1：类型不安全。因为add()的参数是Object类型，意味着任何类型的对象都可以添加成功</p>
-<p>问题2：需要使用强转操作，繁琐。还有可能导致ClassCastException异常</p>
-<h1 id="泛型的使用"><a href="#泛型的使用" class="headerlink" title="泛型的使用"></a>泛型的使用</h1><p><strong>使用说明</strong></p>
-<ul>
-<li>集合框架在生命接口和实现类时使用泛型，在实例化集合对象时，如果没有使用泛型，则认为操作的是Object类型的数据。如果使用了泛型，则需要指明泛型的具体类型。一旦指明了泛型的具体类型，则阿紫集合的相关的方法中，凡是使用泛型的位置，都替换为具体的泛型类型。</li>
-</ul>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">GenericTest</span> &#123;</span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">test</span><span class="params">()</span>&#123;</span><br><span class="line">        List&lt;Integer&gt; list = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;Integer&gt;();</span><br><span class="line">        list.add(<span class="number">78</span>);</span><br><span class="line">        list.add(<span class="number">254</span>);</span><br><span class="line">        list.add(<span class="number">54</span>);</span><br><span class="line">        list.add(<span class="number">99</span>);</span><br><span class="line">        <span class="comment">//编译报错，保证类型安全</span></span><br><span class="line">        <span class="comment">// list.add(&quot;AA&quot;);</span></span><br><span class="line">        Iterator&lt;Integer&gt; iterator = list.iterator();</span><br><span class="line">        <span class="keyword">while</span>(iterator.hasNext())&#123;</span><br><span class="line">            <span class="comment">//因为添加的都是Integer类型，避免了强转操作</span></span><br><span class="line">            <span class="type">Integer</span> <span class="variable">i</span> <span class="operator">=</span> iterator.next();</span><br><span class="line">            <span class="type">int</span> <span class="variable">score</span> <span class="operator">=</span> i;</span><br><span class="line">            System.out.println(score);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//在map中的使用</span></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">test2</span><span class="params">()</span>&#123;</span><br><span class="line">        HashMap&lt;String, Integer&gt; map = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();<span class="comment">//类型推断</span></span><br><span class="line">        map.put(<span class="string">&quot;Tom&quot;</span>, <span class="number">12</span>);</span><br><span class="line">        map.put(<span class="string">&quot;jack&quot;</span>,<span class="number">23</span>);</span><br><span class="line">        map.put(<span class="string">&quot;hh&quot;</span>, <span class="number">24</span>);</span><br><span class="line"></span><br><span class="line">        Set&lt;Map.Entry&lt;String, Integer&gt;&gt; entreSet = map.entrySet();</span><br><span class="line">        Iterator&lt;Map.Entry&lt;String, Integer&gt;&gt; iterator = entreSet.iterator();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> (iterator.hasNext())&#123;</span><br><span class="line">            Map.Entry&lt;String, Integer&gt; entry = iterator.next();</span><br><span class="line">            <span class="type">String</span> <span class="variable">key</span> <span class="operator">=</span> entry.getKey();</span><br><span class="line">            <span class="type">Integer</span> <span class="variable">value</span> <span class="operator">=</span> entry.getValue();</span><br><span class="line">            System.out.println(key+<span class="string">&quot;--&gt;&quot;</span>+value);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h1 id="自定义泛型"><a href="#自定义泛型" class="headerlink" title="自定义泛型"></a>自定义泛型</h1><h2 id="自定义泛型类-接口"><a href="#自定义泛型类-接口" class="headerlink" title="自定义泛型类\接口"></a>自定义泛型类\接口</h2><p><strong>格式</strong></p>
-<p>class A<T>{</p>
-<p>}</p>
-<p>interface B&lt;T1,T2&gt;{</p>
-<p>}</p>
-<p><strong>使用说明：</strong></p>
-<ol>
-<li>声明完自定义泛型类以后，可以在类的内部（比如属性、方法、构造器中）使用类的泛型</li>
-<li>创建自定义泛型类的对象时，可以指明泛型参数类型。一旦指明，内部凡是所使用类的泛型参数的位置，都具体化为指定的类的泛型类型。</li>
-<li>创建自定义泛型类的对象时，没有指明泛型参数类型，那么泛型将被擦除，泛型对应的类型均安装Object处理，但不等于Object。经验：泛型要用使用一路都用，要不用，一路都不用。</li>
-<li>泛型的指定中必须使用引用数据类型。不能使用基本数据类型，此时只能使用包装类替换。</li>
-<li>除创建泛型类对象外，子类继承泛型类时、实现类实现泛型接口时，也可以确定泛型结构中的泛型参数。</li>
-</ol>
-<p>如果我们在给泛型类提供子类时，子类也不确定泛型的类型，则可以继续使用泛型参数。</p>
-<p>我们还可以再现有的父类的泛型参数的基础上，新增泛型参数</p>
-<p><strong>注意：</strong></p>
-<ol>
-<li><p>泛型类可能有多个参数，此时应将多个参数一起放在尖括号内。比如&lt;E1,E2,E3&gt;</p>
-</li>
-<li><p>JDK7开始，泛型的简化操作：ArrayList<Fruit> flist &#x3D; new ArrayList&lt;&gt;();</p>
-</li>
-<li><p>如果泛型结构是一个接口或抽象类，则不可以创建泛型类的对象</p>
-</li>
-<li><p>不能使用new E()。但是可以，E[] elements &#x3D; (E[])new Object[capacity];</p>
-</li>
-<li><p>在类&#x2F;接口上声明的泛型，在本类或本接口中即代表某种类型，但不可以在静态方法中使用类的泛型。</p>
-</li>
-<li><p>异常类不可以带泛型。</p>
-</li>
-</ol>
-<h2 id="自定义泛型方法"><a href="#自定义泛型方法" class="headerlink" title="自定义泛型方法"></a>自定义泛型方法</h2><p><strong>格式</strong>：</p>
-<p>权限修饰符 <T> 返回值类型 方法名（形参列表）{</p>
-<p>}</p>
-<p><strong>举例</strong></p>
-<p>public <E> E method(E e){</p>
-<p>}</p>
-<p><strong>说明</strong></p>
-<ul>
-<li>声明泛型方法时，一定要添加泛型参数<T></li>
-<li>泛型参数在方法调用时，指明其具体的类型</li>
-<li>泛型方法可以根据需要声明为static</li>
-<li>泛型方法所属的类是否是一个泛型类，都可以。</li>
-</ul>
-<h1 id="泛型在继承上的体现"><a href="#泛型在继承上的体现" class="headerlink" title="泛型在继承上的体现"></a>泛型在继承上的体现</h1><p>1.类SuperA是类A的父类，则G<superA>与G<A>的关系？</p>
-<p>二者是并列的两个类，没有任何子父类的关系</p>
-<p>2.类SuperA是类A的父类或接口，superA<G>与A<G>的关系？</p>
-<p>superA<G>与A<G>有继承或实现的关系。即A<G>的实例可以赋值给SuperA<G>类型的引用或变量。</p>
-<h1 id="通配符"><a href="#通配符" class="headerlink" title="通配符"></a>通配符</h1><h2 id="使用说明"><a href="#使用说明" class="headerlink" title="使用说明"></a>使用说明</h2><p>ArrayList&lt;?&gt;</p>
-<p>G<?> 可以看作是G<A>类型的父类，即可以将G<A>的对象赋值给G<?>类型的引用或变量</p>
-<h2 id="读写特点"><a href="#读写特点" class="headerlink" title="读写特点"></a>读写特点</h2><ul>
-<li>读取数据：允许的，读取的值为Object类型</li>
-<li>写入数据：不允许。特例,null</li>
-</ul>
-<h2 id="有限制条件的通配符"><a href="#有限制条件的通配符" class="headerlink" title="有限制条件的通配符"></a>有限制条件的通配符</h2><p>List&lt;? extends A&gt;:可以将List<A>或List<B>赋值给List&lt;? extends A&gt;其中B类是A类的子类</p>
-<p>List&lt;? super A&gt;：可以将List<A>或List<B>赋值给List&lt;? super A&gt;其中B类是A类的父类</p>
-<h1 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a>常见问题</h1><h2 id="Java的泛型是什么？有什么好处和优点？JDK不同版本的泛型有什么区别？"><a href="#Java的泛型是什么？有什么好处和优点？JDK不同版本的泛型有什么区别？" class="headerlink" title="Java的泛型是什么？有什么好处和优点？JDK不同版本的泛型有什么区别？"></a>Java的泛型是什么？有什么好处和优点？JDK不同版本的泛型有什么区别？</h2><p>泛型，是程序中出现的不确定的类型。</p>
-<p>以集合来举例：把一个集合中的内容限制为一个特定的数据类型，这就是generic背后的核心思想。</p>
-
-      
-    </div>
-
-    
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://aluggnb.com/2023/10/08/javaday10_collection_map/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2315,6 +2167,201 @@
   
   
 
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://aluggnb.com/2023/09/28/javaday2_oob2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="Alugg">
+      <meta itemprop="description" content="Step out of your comfort zone">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Alugg's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/09/28/javaday2_oob2/" class="post-title-link" itemprop="url">java-Day2——封装</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-09-28 23:10:25" itemprop="dateCreated datePublished" datetime="2023-09-28T23:10:25+08:00">2023-09-28</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.4k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="1-封装性"><a href="#1-封装性" class="headerlink" title="1.封装性"></a>1.封装性</h1><p>1.1 <strong>四种权限修饰符</strong>：private、缺省、protected、public</p>
+<p>​	类：只能用public、缺省修饰</p>
+<p>​	类的内部成员：四种都可以</p>
+<p>1.2 <strong>作用</strong>：用四种权限修饰来修饰类和类的内部成员。当这些成员被调用时，体现可见性的大小</p>
+<table>
+<thead>
+<tr>
+<th>修饰符</th>
+<th>本类内部</th>
+<th>本包内</th>
+<th>其他包的子类</th>
+<th>其他包的非子类</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>private</td>
+<td>√</td>
+<td>×</td>
+<td>×</td>
+<td>×</td>
+</tr>
+<tr>
+<td>缺省</td>
+<td>√</td>
+<td>√</td>
+<td>×</td>
+<td>×</td>
+</tr>
+<tr>
+<td>protected</td>
+<td>√</td>
+<td>√</td>
+<td>√</td>
+<td>×</td>
+</tr>
+<tr>
+<td>public</td>
+<td>√</td>
+<td>√</td>
+<td>√</td>
+<td>√</td>
+</tr>
+</tbody></table>
+<p>1.3 <strong>使用频率</strong></p>
+<p>比较高：public、private</p>
+<p>低：缺省、protected</p>
+<p>1.4 <strong>封装性体现</strong></p>
+<p>场景1：private类的属性，提供public的get和set方法，对此属性进行获取或修改</p>
+<p>场景2：将类中不需要对外暴露的方法，设置为private</p>
+<p>场景3：单例模式中构造器private的，避免在类的外部创建实例。</p>
+<h1 id="2-构造器"><a href="#2-构造器" class="headerlink" title="2.构造器"></a>2.构造器</h1><p>2.1 构造器的作用</p>
+<p>作用1：搭配new关键字，创建类的对象</p>
+<p>作用2：在创建对象的同时，可以给对象的相关属性赋值</p>
+<p>2.2 构造器使用说明</p>
+<ul>
+<li><p>构造器声明的格式：权限修饰符 类名（形参）{}</p>
+</li>
+<li><p>创建类后，在没有显示提高任何构造器的情况下，系统默认提供一个空参的构造器，且构造器权限与类声明的权限相同</p>
+</li>
+<li><p>一旦类中显示声明了构造器，则系统不再提供默认的空参构造器</p>
+</li>
+<li><p>一个类中可以声明多个构造器，彼此之间构成重载</p>
+</li>
+</ul>
+<h1 id="3-类中属性赋值过程"><a href="#3-类中属性赋值过程" class="headerlink" title="3.类中属性赋值过程"></a>3.类中属性赋值过程</h1><p>3.1类中属性赋值的渠道</p>
+<ol>
+<li>默认初始化</li>
+<li>显示初始化</li>
+<li>构造器初始化</li>
+<li>通过“对象.方法”的方式赋值；</li>
+<li>通过“对象.属性”的方式赋值；</li>
+</ol>
+<h1 id="4-JavaBean"><a href="#4-JavaBean" class="headerlink" title="4.JavaBean"></a>4.JavaBean</h1><p>JavaBean：一种java语言写成的可重用组件</p>
+<p>JavaBean符合如下标准的Java类：</p>
+<ul>
+<li>类是公共的</li>
+<li>有一个无参的公共的构造器</li>
+<li>有属性，且有对应的get、set方法</li>
+</ul>
+<h1 id="5-This-关键字"><a href="#5-This-关键字" class="headerlink" title="5.This 关键字"></a>5.This 关键字</h1><p>5.1 this可以调用的结构： 成员变量、方法、构造器</p>
+<p>5.2 this的理解：当前对象（在方法中调用时）或当前正在创建的对象（在构造器中调用时）</p>
+<p>5.3 this调用属性和方法</p>
+<p>针对于方法内的使用情况（非static）：</p>
+<p>一般情况：通过对象a调用方法，<strong>可以在方法内调用当前对象a的属性或其他方法</strong>。此时，可以在属性和其他方法前使用“this.”，表示当前属性或方法所属的对象a。 但是通常，我们都选择省略”this.”结构</p>
+<p>特殊情况： 如果方法的形参与对象的属性同名了，必须使用this进行区分。</p>
+<p>5.4 this调用构造器</p>
+<p>格式：this(形参)。</p>
+<h1 id="6-常见问题"><a href="#6-常见问题" class="headerlink" title="6.常见问题"></a>6.常见问题</h1><p>6.1 java中内存结构的划分</p>
+<ul>
+<li>java中内存结果划分为： 虚拟机栈、堆、方法区；程序计数器、本地方法栈</li>
+<li>虚拟机栈：以栈帧为基本单位，有入栈和出栈操作；每个栈帧入栈操作对应一个方法的执行；方法内的局部变量会存储在栈帧中。</li>
+<li>堆空间：new出来的结构（数组、对象）： 1.数组，数组的元素在堆中 2.对象的成员变量在堆中</li>
+<li>方法区：加载的类的模版结构</li>
+</ul>
+<p>6.2 Java引用类型有几种？</p>
+<p>类、数组、接口；枚举、注解、记录</p>
+<p>6.3 对象存在java内存的哪种区域里：</p>
+<p>堆空间</p>
+<p>6.4 main方法public能不能换成private？</p>
+<p>能。但是改以后就不能作为程序的入口了，就只是一个普通的方法</p>
+<p>6.5 构造方法和普通方法的区别</p>
+<p>编写角度：没有共同点。 声明格式、作用都不同</p>
+<p>字节码角度：构造器会以<init>（）方法的形态呈现，用以初始化对象。</p>
+<p>6.6 成员变量和局部变量的区别：</p>
+<ul>
+<li>声明的位置</li>
+<li>内存中存放的位置</li>
+<li>作用域</li>
+<li>权限修饰符</li>
+<li>初始化值</li>
+<li>生命周期</li>
+</ul>
+<p>6.7 变量赋值和构造方法加载的优先级问题</p>
+<p>通过字节码文件可以发现变量显示赋值先于构造器中的赋值</p>
+
+      
+    </div>
+
+    
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
 
   
   <nav class="pagination">
@@ -2386,14 +2433,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">43</span>
+          <span class="site-state-item-count">42</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-count">3</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
   </nav>
